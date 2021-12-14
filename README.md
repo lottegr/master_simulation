@@ -1,10 +1,11 @@
 # Commands
 
 In every command window:
+$
     cd ~/catkin_ws/
     catkin_make
     source devel/setup.bash
-
+$
 
 Defining Turtlebots Burger robot as default:
     echo 'export TURTLEBOT3_MODEL=burger' >> ~/.bashrc
