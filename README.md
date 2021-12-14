@@ -1,11 +1,11 @@
 # Commands
 
 In every command window:
-$
+```
     cd ~/catkin_ws/
     catkin_make
     source devel/setup.bash
-$
+```
 
 Defining Turtlebots Burger robot as default:
     echo 'export TURTLEBOT3_MODEL=burger' >> ~/.bashrc
@@ -58,6 +58,6 @@ recordmydesktop --on-the-fly-encoding
 
 
 # TurtleBot3
-<img src="https://github.com/ROBOTIS-GIT/emanual/blob/master/assets/images/platform/turtlebot3/logo_turtlebot3.png" width="100">
+<img src="https://github.com/ROBOTIS-GIT/emanual/blob/master/assets/images/platform/turtlebot3/logo_turtlebot3.png" width="200">
 
 Information about Turtlebot3 can be found in the README.md file in turtlebot3_simulations
