@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(simulation_test)
+project(simulation_code)
 
 ## Find catkin and any catkin packages
 find_package(catkin REQUIRED COMPONENTS

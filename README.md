@@ -18,7 +18,7 @@ source ~/.bashrc
 
 Run GAZEBO:
 ```
-    roslaunch turtlebot3_gazebo "WORLDNAME".launch
+roslaunch turtlebot3_gazebo "WORLDNAME".launch
 ```
 
 Run KEYBOARD teleoperation:
@@ -44,7 +44,7 @@ With the above command, "NAME".pgm and "NAME".yaml will be saved in the home fol
 
 Run NAVIGATION: 
 ```
-roslaunch turtlebot3_navigation turtlebot3_navigation.launch map_file:=$HOME/gazebo/"NAME".yaml
+roslaunch turtlebot3_navigation turtlebot3_navigation.launch map_file:=$HOME/"NAME".yaml
 ```
 
 <!-- JOYSTICK: 
@@ -54,7 +54,7 @@ roslaunch turtlebot3_navigation turtlebot3_navigation.launch map_file:=$HOME/gaz
 
 Run SIMULATION:
 ```
-rosrun turtlebot3_gazebo turtlebot3_drive
+rosrun simulation_code simudrive
 ```
 -----------------------------------------------------------
 
