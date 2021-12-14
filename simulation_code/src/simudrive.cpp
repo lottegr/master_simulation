@@ -245,11 +245,11 @@ bool SimulationDrive::simulationLoop()
             begin = ros::Time::now();
             makeUturn(round);
             turns += 1;
-            
+            round += 1;
           }
 
           updatecommandVelocity(lin_vel,0.0);
-          round += 1;
+          
           rb_status = get_placement;
         } 
         else
