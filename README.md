@@ -2,40 +2,50 @@
 
 In every command window:
 ```
-    cd ~/catkin_ws/
-    catkin_make
-    source devel/setup.bash
+cd ~/catkin_ws/
+catkin_make
+source devel/setup.bash
 ```
 
 Defining Turtlebots Burger robot as default:
-    echo 'export TURTLEBOT3_MODEL=burger' >> ~/.bashrc
-    source ~/.bashrc
-    <!-- check with: $ echo $TURTLEBOT3_MODEL -->
+```
+echo 'export TURTLEBOT3_MODEL=burger' >> ~/.bashrc
+source ~/.bashrc
+```
+<!-- check with: $ echo $TURTLEBOT3_MODEL -->
 
 -----------------------------------------------------------
 
 Run GAZEBO:
+```
     roslaunch turtlebot3_gazebo "WORLDNAME".launch
+```
 
 Run KEYBOARD teleoperation:
-    roslaunch turtlebot3_teleop turtlebot3_teleop_key.launch
-
+```    
+roslaunch turtlebot3_teleop turtlebot3_teleop_key.launch
+```
 -----------------------------------------------------------
 
 Run SLAM:
-    roslaunch turtlebot3_slam turtlebot3_slam.launch
-    
+```
+roslaunch turtlebot3_slam turtlebot3_slam.launch
+```
+
 Save map file:
-    $ rosrun map_server map_saver -f ~/"NAME"
-    $ rosrun map_server map_saver -f ~/gazebo/"NAME"
+```
+rosrun map_server map_saver -f ~/"NAME"
+```
+<!-- $ rosrun map_server map_saver -f ~/gazebo/"NAME" -->
     
 With the above command, "NAME".pgm and "NAME".yaml will be saved in the home folder ~/(/home/${username}).
 
 -----------------------------------------------------------
 
 Run NAVIGATION: 
-    roslaunch turtlebot3_navigation turtlebot3_navigation.launch map_file:=$HOME/gazebo/"NAME".yaml
-
+```
+roslaunch turtlebot3_navigation turtlebot3_navigation.launch map_file:=$HOME/gazebo/"NAME".yaml
+```
 
 <!-- JOYSTICK: 
 /home/lotte/catkin_ws/src/robot_gui_bridge/gui/gui.html
@@ -43,13 +53,15 @@ Run NAVIGATION:
 
 
 Run SIMULATION:
-    rosrun turtlebot3_gazebo turtlebot3_drive
-
+```
+rosrun turtlebot3_gazebo turtlebot3_drive
+```
 -----------------------------------------------------------
 
 Record screen:
+```
 recordmydesktop --on-the-fly-encoding
-
+```
 
 
 
