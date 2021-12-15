@@ -31,16 +31,7 @@
 #include "geometry_msgs/PoseWithCovarianceStamped.h"
 
 #include <move_base_msgs/MoveBaseAction.h>
-#include <actionlib_msgs/GoalStatusArray.h>
-#include <actionlib_msgs/GoalStatus.h>
-
-
-#include <move_base_msgs/MoveBaseAction.h>
 #include <actionlib/client/simple_action_client.h>
-
-
-
-
 
 
 

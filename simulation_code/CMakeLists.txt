@@ -27,3 +27,11 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 add_executable(simudrive src/simudrive.cpp)
 target_link_libraries(simudrive ${catkin_LIBRARIES})
 add_dependencies(simudrive ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+add_executable(simudrive_2point src/simudrive_2point.cpp)
+target_link_libraries(simudrive_2point ${catkin_LIBRARIES})
+add_dependencies(simudrive_2point ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+add_executable(simudrive_goal src/simudrive_goal.cpp)
+target_link_libraries(simudrive_goal ${catkin_LIBRARIES})
+add_dependencies(simudrive_goal ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})

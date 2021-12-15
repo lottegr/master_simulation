@@ -214,24 +214,16 @@ bool SimulationDrive::simulationLoop()
 
     case betong_turn:
       if (!first) {
-        pose_goal_x = pose_pos_x + 0.3;
-        pose_goal_y = pose_pos_y;
-        if (round%2 == 1)
-        {
-          pose_goal_rot = pose_rot + 90;
-        }
-        else 
-        {
-          pose_goal_rot = pose_rot - 90;
-        }
+        pose_goal_x = 0;
+        pose_goal_y = pose_pos_y + 0.4;
+
+        pose_goal_rot = pose_rot + 180;
         
-        while (turns < 2) 
+        while (turns < 1) 
         {
-          updateNavigationGoal(0, pose_goal_y, pose_goal_rot);
+          updateNavigationGoal(pose_goal_x, pose_goal_y, pose_goal_rot);
           turns += 1;
           round += 1;
-          updateNavigationGoal(0, pose_goal_y + 0.4, pose_goal_rot + 90);
-          turns += 1;
         }
 
         updateCommandVelocity(lin_vel,0.0);
