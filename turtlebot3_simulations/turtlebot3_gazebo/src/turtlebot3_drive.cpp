@@ -83,10 +83,6 @@ void Turtlebot3Drive::laserScanMsgCallBack(const sensor_msgs::LaserScan::ConstPt
       scan_data_[num] = msg->ranges.at(scan_angle[num]);
     }
   }
-
-
-  ROS_INFO_STREAM("front: " << scan_data_[0] << ", left: " << scan_data_[1] << ", right: " << scan_data_[2]);
-
 }
 
 void Turtlebot3Drive::updatecommandVelocity(double linear, double angular)

@@ -11,7 +11,7 @@ SimulationDrive::SimulationDrive()
 
 SimulationDrive::~SimulationDrive()
 {
-  updatecommandVelocity(0.0, 0.0);
+  updateCommandVelocity(0.0, 0.0);
   ros::shutdown();
 }
 
@@ -25,23 +25,17 @@ bool SimulationDrive::init()
   forward_dist_ = 0.3;
   side_dist_    = 0.3;
 
-
   // initialize publishers
-  cmd_vel_pub_   = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 10);
-
-  goal_pub_ = nh_.advertise<move_base_msgs::MoveBaseActionGoal>("/move_base/goal", 10);
-
+  cmd_vel_pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 10);
+  init_pose_pub_ = nh_.advertise<geometry_msgs::PoseWithCovarianceStamped>("/initialpose", 10);
 
   // initialize subscribers
   laser_scan_sub_  = nh_.subscribe("scan", 10, &SimulationDrive::laserScanMsgCallBack, this);
-  // odom_sub_ = nh_.subscribe("odom", 10, &SimulationDrive::odomMsgCallBack, this);
-
+  odom_sub_ = nh_.subscribe("odom", 10, &SimulationDrive::odomMsgCallBack, this);
   pose_sub_ = nh_.subscribe("/amcl_pose", 10, &SimulationDrive::poseMsgCallBack, this);
     
-
   return true;
 }
-
 
 
 
@@ -59,7 +53,6 @@ void SimulationDrive::odomMsgCallBack(const nav_msgs::Odometry::ConstPtr &msg)
 
 void SimulationDrive::laserScanMsgCallBack(const sensor_msgs::LaserScan::ConstPtr &msg)
 {
-  // uint16_t scan_angle[3] = {0, 30, 330};
   uint16_t scan_angle[4] = {0, 90, 180, 270};
 
   for (int num = 0; num < 4; num++)
@@ -73,8 +66,6 @@ void SimulationDrive::laserScanMsgCallBack(const sensor_msgs::LaserScan::ConstPt
       scan_data_[num] = msg->ranges.at(scan_angle[num]);
     }
   }
-
-  // ROS_INFO_STREAM("front: " << scan_data_[0] << ", left: " << scan_data_[1] << ", right: " << scan_data_[2]);
 }
 
 void SimulationDrive::poseMsgCallBack(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr &msg)
@@ -85,8 +76,6 @@ void SimulationDrive::poseMsgCallBack(const geometry_msgs::PoseWithCovarianceSta
 	pose_rot = atan2(siny, cosy) * RAD2DEG;
   pose_pos_x = msg->pose.pose.position.x;
   pose_pos_y = msg->pose.pose.position.y;
-
-  // ROS_INFO_STREAM("x: " << pose_pos_x << ", y: " << pose_pos_y << ", z: " << pose_rot);
 }
 
 
@@ -94,7 +83,7 @@ void SimulationDrive::poseMsgCallBack(const geometry_msgs::PoseWithCovarianceSta
 
 // publishers
 
-void SimulationDrive::updatecommandVelocity(double linear, double angular)
+void SimulationDrive::updateCommandVelocity(double linear, double angular)
 {
   geometry_msgs::Twist cmd_vel;
 
@@ -105,6 +94,21 @@ void SimulationDrive::updatecommandVelocity(double linear, double angular)
 }
 
 
+void SimulationDrive::updateIntialPose(double pos_x, double pos_y, double rot_z)
+{
+  geometry_msgs::PoseWithCovarianceStamped init_pose;
+
+  init_pose.pose.pose.position.x = pos_x;
+  init_pose.pose.pose.position.y = pos_y;
+
+  init_pose.pose.pose.orientation.z = sin(rot_z * DEG2RAD * 0.5);
+  init_pose.pose.pose.orientation.w = cos(rot_z * DEG2RAD * 0.5);
+
+  init_pose.header.stamp = ros::Time::now();
+  init_pose.header.frame_id = "map";
+
+  init_pose_pub_.publish(init_pose);
+}
 
 
 void SimulationDrive::updateNavigationGoal(double pos_x, double pos_y, double rot_z)
@@ -116,8 +120,6 @@ void SimulationDrive::updateNavigationGoal(double pos_x, double pos_y, double ro
 
   posegoal.target_pose.pose.position.x = pos_x;
   posegoal.target_pose.pose.position.y = pos_y;
-  
-  // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
   posegoal.target_pose.pose.orientation.z = sin(rot_z * DEG2RAD * 0.5);
   posegoal.target_pose.pose.orientation.w = cos(rot_z * DEG2RAD * 0.5);
 
@@ -136,22 +138,19 @@ void SimulationDrive::makeUturn(int round)
 
   double lin = 0.2;
   double ang = lin / (dist_rows_y*0.5);
-
   double time_circle = 180*DEG2RAD / ang;
-
 
   if (round%2 == 0) 
   {
     ang = -ang;
   }
 
-  updatecommandVelocity(0,0);
+  updateCommandVelocity(0,0);
   ros::Duration(1).sleep();
-  updatecommandVelocity(lin, ang);
+  updateCommandVelocity(lin, ang);
   ros::Duration(time_circle).sleep();
-  updatecommandVelocity(0,0);
+  updateCommandVelocity(0,0);
   ros::Duration(2).sleep();
-
 }
 
 
@@ -177,12 +176,12 @@ bool SimulationDrive::simulationLoop()
         if (scan_data_[left] < side_dist_ && scan_data_[right] < side_dist_)
         {
           
-          if (enter_f && !enter_b)
+          if (drive_f && !drive_b)
           {
             rb_status = rail_f;
             ROS_INFO_STREAM("rail_f");
           }
-          else if (!enter_f && enter_b)
+          else if (!drive_f && drive_b)
           {
             rb_status = rail_b;
             ROS_INFO_STREAM("rail_b");
@@ -191,17 +190,17 @@ bool SimulationDrive::simulationLoop()
         }
         else
         {
-          if (enter_f && !enter_b) 
+          if (drive_f && !drive_b) 
           {
             rb_status = betong_turn;
             ROS_INFO_STREAM("betong_turn");
-            enter_f = true;
+            drive_f = true;
           }
-          else if (!enter_f && enter_b) 
+          else if (!drive_f && drive_b) 
           {
             rb_status = betong_cross;
             ROS_INFO_STREAM("betong_cross");
-            enter_b = true;
+            drive_b = true;
           }
         }
       }
@@ -213,21 +212,21 @@ bool SimulationDrive::simulationLoop()
           {
             rb_status = rail_end_f;
             ROS_INFO_STREAM("end_f");
-            enter_f = false;
-            enter_b = true;
+            drive_f = false;
+            drive_b = true;
           }
           else if (scan_data_[backward] < forward_dist_)
           {
             rb_status = rail_end_b;
             ROS_INFO_STREAM("end_b");
-            enter_f = true;
-            enter_b = false;
+            drive_f = true;
+            drive_b = false;
           }
 
         }
         else
         {
-          ROS_WARN("where tf are u now?!");
+          ROS_WARN("where are you now?!");
         }
       }
         
@@ -248,7 +247,7 @@ bool SimulationDrive::simulationLoop()
             round += 1;
           }
 
-          updatecommandVelocity(lin_vel,0.0);
+          updateCommandVelocity(lin_vel,0.0);
           
           rb_status = get_placement;
         } 
@@ -260,39 +259,38 @@ bool SimulationDrive::simulationLoop()
       }
       else
       {
-        updatecommandVelocity(lin_vel, 0.0);
+        updateCommandVelocity(lin_vel, 0.0);
         rb_status = get_placement;
       }
       break;
 
 
     case betong_cross:
-      updatecommandVelocity(-lin_vel, 0.0);
+      updateCommandVelocity(-lin_vel, 0.0);
       rb_status = get_placement;
       break;
 
     case rail_f:
-      updatecommandVelocity(lin_vel, 0.0);
+      updateCommandVelocity(lin_vel, 0.0);
       first = false;
       turns = 0;
       rb_status = get_placement;
       break;
 
     case rail_b:
-      updatecommandVelocity(-lin_vel, 0.0);
+      updateCommandVelocity(-lin_vel, 0.0);
       rb_status = get_placement;
       break;
 
     case rail_end_f:
-      updatecommandVelocity(-lin_vel, 0.0);
+      updateCommandVelocity(-lin_vel, 0.0);
       rb_status = get_placement;
       break;
 
     case rail_end_b:
-      updatecommandVelocity(lin_vel, 0.0);
+      updateCommandVelocity(lin_vel, 0.0);
       rb_status = get_placement;
       break;
-
 
 
     default:

@@ -92,19 +92,18 @@ class SimulationDrive
 
   // ROS Topic Publishers
   ros::Publisher cmd_vel_pub_;
-
   ros::Publisher goal_pub_;
+  ros::Publisher init_pose_pub_;
 
   // ROS Topic Subscribers
   ros::Subscriber laser_scan_sub_;
   ros::Subscriber odom_sub_;
 
   ros::Subscriber pose_sub_;
-  ros::Subscriber goal_sub_;
   ros::Subscriber move_base_status_sub_;
 
+  // ROS Action Clients
   typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> status_client_;
-  
 
   // Variables
   double forward_dist_;
@@ -122,15 +121,15 @@ class SimulationDrive
   double pose_goal_x;
   double pose_goal_y;
 
-  bool enter_f = true;
-  bool enter_b = false;
-  bool rail = false;
+  bool drive_f = true;
+  bool drive_b = false;
   bool first = true;
   int turns;
   int round = 1;
 
-  // Function prototypes
-  void updatecommandVelocity(double linear, double angular);
+  // Functions
+  void updateCommandVelocity(double linear, double angular);
+  void updateIntialPose(double pos_x, double pos_y, double rot_z);
   void updateNavigationGoal(double pos_x, double pos_y, double rot_z);
   
   void laserScanMsgCallBack(const sensor_msgs::LaserScan::ConstPtr &msg);
