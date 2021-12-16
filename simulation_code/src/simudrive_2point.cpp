@@ -137,14 +137,11 @@ void SimulationDrive::makeUturn(int round)
   ros::Time now = ros::Time::now();
 
   double lin = 0.2;
-  double ang = lin / (dist_rows_y*0.5);
+  double ang = 1.0;
 
   double time_x = 0.5*dist_rows_x / lin;
-  double time_turn = 88*DEG2RAD / ang;
+  double time_turn = 0.96*90*DEG2RAD / ang;
   double time_y = dist_rows_y / lin;
-
-  double time_circle = 180*DEG2RAD / ang;
-
 
   if (round%2 == 0) 
   {
@@ -167,8 +164,6 @@ void SimulationDrive::makeUturn(int round)
   ros::Duration(time_turn).sleep();
   updateCommandVelocity(0,0);
   ros::Duration(1).sleep();
-
-
 }
 
 
@@ -210,14 +205,14 @@ bool SimulationDrive::simulationLoop()
         {
           if (drive_f && !drive_b) 
           {
-            rb_status = betong_turn;
-            ROS_INFO_STREAM("betong_turn");
+            rb_status = concrete_turn;
+            ROS_INFO_STREAM("concrete_turn");
             drive_f = true;
           }
           else if (!drive_f && drive_b) 
           {
-            rb_status = betong_cross;
-            ROS_INFO_STREAM("betong_cross");
+            rb_status = concrete_cross;
+            ROS_INFO_STREAM("concrete_cross");
             drive_b = true;
           }
         }
@@ -252,7 +247,7 @@ bool SimulationDrive::simulationLoop()
 
 // ----------------------------------------------------------------
 
-    case betong_turn:
+    case concrete_turn:
       if (!first) 
       {
         if (round != 4)
@@ -283,7 +278,7 @@ bool SimulationDrive::simulationLoop()
       break;
 
 
-    case betong_cross:
+    case concrete_cross:
       updateCommandVelocity(-lin_vel, 0.0);
       rb_status = get_placement;
       break;
@@ -335,7 +330,7 @@ int main(int argc, char* argv[])
   ros::init(argc, argv, "simudrive");
   SimulationDrive simudrive;
 
-  ros::Rate loop_rate(75);
+  ros::Rate loop_rate(125);
 
   while (ros::ok())
   {

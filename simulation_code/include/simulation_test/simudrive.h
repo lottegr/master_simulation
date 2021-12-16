@@ -51,8 +51,8 @@
 #define right     3
 
 #define get_placement 0 
-#define betong_cross  1 
-#define betong_turn   2
+#define concrete_cross  1 
+#define concrete_turn   2
 #define rail_f        3
 #define rail_b        4
 #define rail_end_f    5

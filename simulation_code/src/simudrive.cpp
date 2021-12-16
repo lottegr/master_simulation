@@ -192,14 +192,14 @@ bool SimulationDrive::simulationLoop()
         {
           if (drive_f && !drive_b) 
           {
-            rb_status = betong_turn;
-            ROS_INFO_STREAM("betong_turn");
+            rb_status = concrete_turn;
+            ROS_INFO_STREAM("concrete_turn");
             drive_f = true;
           }
           else if (!drive_f && drive_b) 
           {
-            rb_status = betong_cross;
-            ROS_INFO_STREAM("betong_cross");
+            rb_status = concrete_cross;
+            ROS_INFO_STREAM("concrete_cross");
             drive_b = true;
           }
         }
@@ -234,10 +234,10 @@ bool SimulationDrive::simulationLoop()
 
 // ----------------------------------------------------------------
 
-    case betong_turn:
+    case concrete_turn:
       if (!first) 
       {
-        if (round != 4)
+        if (round < 4)
         {
           while (turns < 1) 
           {
@@ -248,6 +248,7 @@ bool SimulationDrive::simulationLoop()
           }
 
           updateCommandVelocity(lin_vel,0.0);
+          ros::Duration(2).sleep();
           
           rb_status = get_placement;
         } 
@@ -265,7 +266,7 @@ bool SimulationDrive::simulationLoop()
       break;
 
 
-    case betong_cross:
+    case concrete_cross:
       updateCommandVelocity(-lin_vel, 0.0);
       rb_status = get_placement;
       break;
@@ -316,7 +317,7 @@ int main(int argc, char* argv[])
   ros::init(argc, argv, "simudrive");
   SimulationDrive simudrive;
 
-  ros::Rate loop_rate(100);
+  ros::Rate loop_rate(125);
 
   while (ros::ok())
   {

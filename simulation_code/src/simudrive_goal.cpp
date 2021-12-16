@@ -129,6 +129,7 @@ void SimulationDrive::updateNavigationGoal(double pos_x, double pos_y, double ro
   ROS_INFO("Sending goal");
   ac.sendGoal(posegoal);
   ac.waitForResult();
+  ros::Duration(1).sleep();
 }
 
 
@@ -170,14 +171,14 @@ bool SimulationDrive::simulationLoop()
         {
           if (drive_f && !drive_b) 
           {
-            rb_status = betong_turn;
-            ROS_INFO_STREAM("betong_turn");
+            rb_status = concrete_turn;
+            ROS_INFO_STREAM("concrete_turn");
             drive_f = true;
           }
           else if (!drive_f && drive_b) 
           {
-            rb_status = betong_cross;
-            ROS_INFO_STREAM("betong_cross");
+            rb_status = concrete_cross;
+            ROS_INFO_STREAM("concrete_cross");
             drive_b = true;
           }
         }
@@ -204,7 +205,7 @@ bool SimulationDrive::simulationLoop()
         }
         else
         {
-          ROS_WARN("where tf are u now?!");
+          ROS_WARN("where are you now?!");
         }
       }
         
@@ -212,32 +213,42 @@ bool SimulationDrive::simulationLoop()
 
 // ----------------------------------------------------------------
 
-    case betong_turn:
-      if (!first) {
-        pose_goal_x = 0;
-        pose_goal_y = pose_pos_y + 0.4;
-
-        pose_goal_rot = pose_rot + 180;
-        
-        while (turns < 1) 
+    case concrete_turn:
+      if (!first) 
+      {
+        if (round < 4)
         {
-          updateNavigationGoal(pose_goal_x, pose_goal_y, pose_goal_rot);
-          turns += 1;
-          round += 1;
-        }
+          pose_goal_x = 0;
+          pose_goal_y = pose_pos_y + 0.4;
+          pose_goal_rot = pose_rot + 180;
+          
+          while (turns < 1) 
+          {
+            updateNavigationGoal(pose_goal_x, pose_goal_y, pose_goal_rot);
+            turns += 1;
+            round += 1;
+          }
 
-        updateCommandVelocity(lin_vel,0.0);
-        rb_status = get_placement;
+          updateCommandVelocity(lin_vel,0.0);
+          rb_status = get_placement;
+        } 
+        else
+        {
+          updateNavigationGoal(0, 0, 0);
+          ROS_INFO_STREAM("Simulation ended");
+        }
       }
       else
       {
+        updateIntialPose(0,0,0);
+        ros::Duration(2).sleep();
         updateCommandVelocity(lin_vel, 0.0);
         rb_status = get_placement;
       }
       break;
 
 
-    case betong_cross:
+    case concrete_cross:
       updateCommandVelocity(-lin_vel, 0.0);
       rb_status = get_placement;
       break;
