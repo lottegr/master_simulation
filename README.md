@@ -12,7 +12,7 @@
 | turtlebot3_simulations | turtlebot3_gazebo/launch | testrail.launch              | New - based on "turtlebot3_empty_world.launch"                 |
 |                        | turtlebot3_gazebo/worlds | testrail.world               | New - generated from Gazebo                                    |
 
-
+If no information is given, files are as original in the Turtlebot3 repositiries. 
 
 
 
