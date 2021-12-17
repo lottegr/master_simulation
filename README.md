@@ -3,15 +3,16 @@
 | Folder                 | Subfolder                | File                         | Changes                                                        |
 |------------------------|--------------------------|------------------------------|----------------------------------------------------------------|
 | rb1_description        | meshes                   | All                          | New - Files recieved from Adigo                                |
-| ^^                     | urdf                     | rb1_description.gazebo.xacro | New - based on "turtlebot3_burger.gazebo.xacro"                |
-| ^^                     | ^^                       | rb1_description.urdf.xacro   | Changes - based on "turtlebot3_burger.urdf.xacro"              |
-
+|                        | urdf                     | rb1_description.gazebo.xacro | New - based on "turtlebot3_burger.gazebo.xacro"                |
+|                        |                          | rb1_description.urdf.xacro   | Changes - based on "turtlebot3_burger.urdf.xacro"              |
 | simulation_code        | All                      | All                          | New - based on "turtlebot3_drive.cpp" and "turtlebot3_drive.h" |
 | turtlebot3_navigation  | launch                   | turtlebot3_navigation.launch | Changes: set default map                                       |
-| ^^                     | maps                     | temprail.yaml                | New map files generated with SLAM                              |
-| ^^                     | ^^                       | temprail.pgm                 | ^^                                                             |
+|                        | maps                     | temprail.yaml                | New map files generated with SLAM                              |
+|                        |                          | temprail.pgm                 |                                                                |
 | turtlebot3_simulations | turtlebot3_gazebo/launch | testrail.launch              | New - based on "turtlebot3_empty_world.launch"                 |
-| ^^                     | turtlebot3_gazebo/worlds | testrail.world               | New - generated from Gazebo                                    |
+|                        | turtlebot3_gazebo/worlds | testrail.world               | New - generated from Gazebo                                    |
+
+
 
 
 
