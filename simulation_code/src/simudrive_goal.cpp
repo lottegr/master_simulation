@@ -230,6 +230,7 @@ bool SimulationDrive::simulationLoop()
           }
 
           updateCommandVelocity(lin_vel,0.0);
+          ros::Duration(2).sleep();
           rb_status = get_placement;
         } 
         else
