@@ -1,0 +1,4 @@
+<launch>
+    <node name="simudrive" pkg="simulation_code" type="simudrive" output="screen"/>
+    <node name="localize" pkg="simulation_code" type="localize" output="screen"/>
+</launch>

@@ -1,30 +1,10 @@
-/*******************************************************************************
-* Copyright 2016 ROBOTIS CO., LTD.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*******************************************************************************/
-
-/* Authors: Taehun Lim (Darby) */
-
-#ifndef SIMUDRIVE_H_
-#define SIMUDRIVE_H_
-
 #include <ros/ros.h>
 #include <math.h>
 
 #include <sensor_msgs/LaserScan.h>
 #include <geometry_msgs/Twist.h>
 #include <nav_msgs/Odometry.h>
+#include <simulation_code/Localization.h>
 
 #include "geometry_msgs/Pose.h"
 #include <geometry_msgs/PoseStamped.h>
@@ -32,9 +12,6 @@
 
 #include <move_base_msgs/MoveBaseAction.h>
 #include <actionlib/client/simple_action_client.h>
-
-
-
 
 #define DEG2RAD (M_PI / 180.0)
 #define RAD2DEG (180.0 / M_PI)
@@ -59,14 +36,11 @@
 #define rail_end_b    6
 
 
-
-
-
-class SimulationDrive
+class Localization
 {
  public:
-  SimulationDrive();
-  ~SimulationDrive();
+  Localization();
+  ~Localization();
   bool init();
   bool controlLoop();
   bool simulationLoop();
@@ -85,11 +59,11 @@ class SimulationDrive
   ros::Publisher cmd_vel_pub_;
   ros::Publisher goal_pub_;
   ros::Publisher init_pose_pub_;
+  ros::Publisher localization_pub_;
 
   // ROS Topic Subscribers
   ros::Subscriber laser_scan_sub_;
   ros::Subscriber odom_sub_;
-
   ros::Subscriber pose_sub_;
   ros::Subscriber move_base_status_sub_;
 
@@ -119,14 +93,13 @@ class SimulationDrive
   int round = 1;
 
   // Functions
-  void updateCommandVelocity(double linear, double angular);
-  void updateIntialPose(double pos_x, double pos_y, double rot_z);
-  void updateNavigationGoal(double pos_x, double pos_y, double rot_z);
+  // void updateCommandVelocity(double linear, double angular);
+//   void updateIntialPose(double pos_x, double pos_y, double rot_z);
+//   void updateNavigationGoal(double pos_x, double pos_y, double rot_z);
+  void updateLocalization(double row_, const char* section_);
   
-  void laserScanMsgCallBack(const sensor_msgs::LaserScan::ConstPtr &msg);
+  // void laserScanMsgCallBack(const sensor_msgs::LaserScan::ConstPtr &msg);
   void odomMsgCallBack(const nav_msgs::Odometry::ConstPtr &msg);
   void poseMsgCallBack(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr &msg);
-  
-  void makeUturn(int round);
+
 };
-#endif // SIMUDRIVE_H_

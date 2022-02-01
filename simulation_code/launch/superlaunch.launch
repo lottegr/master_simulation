@@ -1,0 +1,11 @@
+<launch>
+
+    <arg name="nav_node" default="simudrive_feedback"/>
+    <!-- roslaunch simulation_code superlaunch.launch nav_node:="NAME" -->
+
+    <include file="$(find turtlebot3_gazebo)/launch/testrail.launch" />
+    <include file="$(find turtlebot3_navigation)/launch/turtlebot3_navigation.launch" />
+
+    <node name="$(arg nav_node)" pkg="simulation_code" type="$(arg nav_node)" output="screen"/>
+    <node name="localize" pkg="simulation_code" type="localize" output="screen"/>
+</launch>

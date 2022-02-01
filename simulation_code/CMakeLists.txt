@@ -10,16 +10,36 @@ find_package(catkin REQUIRED COMPONENTS
   nav_msgs
   tf
   gazebo_ros
+  message_generation
 )
 
 find_package(gazebo REQUIRED)
 
+
+
+
+add_message_files(
+  FILES
+  Localization.msg
+)
+
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+)
+
+
 ## Declare a catkin package
 catkin_package(
   INCLUDE_DIRS include
-  CATKIN_DEPENDS roscpp std_msgs sensor_msgs geometry_msgs nav_msgs tf gazebo_ros
+  CATKIN_DEPENDS roscpp std_msgs sensor_msgs geometry_msgs nav_msgs tf gazebo_ros message_runtime
   DEPENDS GAZEBO
 )
+
+
+
+
+
 
 ## Build talker and listener
 include_directories(include ${catkin_INCLUDE_DIRS})
@@ -35,3 +55,12 @@ add_dependencies(simudrive_2point ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_E
 add_executable(simudrive_goal src/simudrive_goal.cpp)
 target_link_libraries(simudrive_goal ${catkin_LIBRARIES})
 add_dependencies(simudrive_goal ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+
+add_executable(simudrive_feedback src/simudrive_feedback.cpp)
+target_link_libraries(simudrive_feedback ${catkin_LIBRARIES})
+add_dependencies(simudrive_feedback ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+add_executable(localize src/localize.cpp)
+target_link_libraries(localize ${catkin_LIBRARIES})
+add_dependencies(localize ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})

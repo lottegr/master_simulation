@@ -1,0 +1,6 @@
+<launch>
+    <include file="$(find turtlebot3_gazebo)/launch/testrail.launch" />
+    <include file="$(find turtlebot3_navigation)/launch/turtlebot3_navigation.launch" />
+
+    <node name="localize" pkg="simulation_code" type="localize" output="screen"/>
+</launch>

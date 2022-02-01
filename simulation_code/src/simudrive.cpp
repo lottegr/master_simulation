@@ -1,4 +1,4 @@
-#include "simulation_test/simudrive.h"
+#include "simulation_code/simudrive.h"
 
 SimulationDrive::SimulationDrive()
   : nh_priv_("~")
@@ -28,6 +28,7 @@ bool SimulationDrive::init()
   // initialize publishers
   cmd_vel_pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 10);
   init_pose_pub_ = nh_.advertise<geometry_msgs::PoseWithCovarianceStamped>("/initialpose", 10);
+  env_pub_ = nh_.advertise<std_msgs::String>("/environment", 10);
 
   // initialize subscribers
   laser_scan_sub_  = nh_.subscribe("scan", 10, &SimulationDrive::laserScanMsgCallBack, this);
@@ -131,6 +132,19 @@ void SimulationDrive::updateNavigationGoal(double pos_x, double pos_y, double ro
   ac.waitForResult();
 }
 
+void SimulationDrive::updateEnvironment(std::string environment)
+{
+  std_msgs::String env;
+  env.data = environment;
+
+  env_pub_.publish(env);
+}
+
+
+
+
+
+// u turn function
 
 void SimulationDrive::makeUturn(int round)
 {
@@ -179,12 +193,12 @@ bool SimulationDrive::simulationLoop()
           if (drive_f && !drive_b)
           {
             rb_status = rail_f;
-            ROS_INFO_STREAM("rail_f");
+            updateEnvironment("rail_f");
           }
           else if (!drive_f && drive_b)
           {
             rb_status = rail_b;
-            ROS_INFO_STREAM("rail_b");
+            updateEnvironment("rail_b");
           }
         
         }
@@ -193,13 +207,13 @@ bool SimulationDrive::simulationLoop()
           if (drive_f && !drive_b) 
           {
             rb_status = concrete_turn;
-            ROS_INFO_STREAM("concrete_turn");
+            updateEnvironment("concrete_turn");
             drive_f = true;
           }
           else if (!drive_f && drive_b) 
           {
             rb_status = concrete_cross;
-            ROS_INFO_STREAM("concrete_cross");
+            updateEnvironment("concrete_cross");
             drive_b = true;
           }
         }
@@ -211,14 +225,14 @@ bool SimulationDrive::simulationLoop()
           if (scan_data_[forward] < forward_dist_) 
           {
             rb_status = rail_end_f;
-            ROS_INFO_STREAM("end_f");
+            updateEnvironment("end_f");
             drive_f = false;
             drive_b = true;
           }
           else if (scan_data_[backward] < forward_dist_)
           {
             rb_status = rail_end_b;
-            ROS_INFO_STREAM("end_b");
+            updateEnvironment("end_b");
             drive_f = true;
             drive_b = false;
           }
@@ -260,6 +274,8 @@ bool SimulationDrive::simulationLoop()
       }
       else
       {
+        updateIntialPose(0,0,0);
+        ros::Duration(2).sleep();
         updateCommandVelocity(lin_vel, 0.0);
         rb_status = get_placement;
       }
