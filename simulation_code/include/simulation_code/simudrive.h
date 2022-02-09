@@ -43,11 +43,11 @@
 #define DEG2RAD (M_PI / 180.0)
 #define RAD2DEG (180.0 / M_PI)
 
-#define lin_vel   0.3
+#define lin_vel   0.5
 #define ang_vel   1.5
 
-#define dist_rows_y   0.4
-#define dist_rows_x   0.3
+#define dist_rows_y   1.5
+#define dist_rows_x   4
 
 #define forward   0 
 #define left      1
@@ -114,6 +114,8 @@ class SimulationDrive
   double pose_odom_rot;
   double pose_odom_pos_x;
   double pose_odom_pos_y;
+  double twist_odom_lin;
+  double twist_odom_ang;
   double pose_goal_rot;
   double pose_goal_x;
   double pose_goal_y;
@@ -129,7 +131,7 @@ class SimulationDrive
 
   // Functions
   void updateCommandVelocity(double linear, double angular);
-  void updateIntialPose(double pos_x, double pos_y, double rot_z);
+  void updateInitialPose(double pos_x, double pos_y, double rot_z);
   void updateNavigationGoal(double pos_x, double pos_y, double rot_z);
   void updateEnvironment(std::string environment);
   
@@ -138,8 +140,9 @@ class SimulationDrive
   void poseMsgCallBack(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr &msg);
   void localizationCallBack(const simulation_code::LocalizationConstPtr &msg);
   
+  void cross(int direction, int row);
   void makeUturn(int round);
-  void uturn();
+  // void uturn();
   void write_to_file(std::vector<double> v, std::string name);
 
   // std::ofstream outFile;
@@ -148,14 +151,25 @@ class SimulationDrive
   std::vector<double> y3;
   std::vector<double> y4;
   std::vector<double> y5;
+  std::vector<double> l1;
+  std::vector<double> l3;
+  std::vector<double> l5;
 
   std::vector<double> y1u;
   std::vector<double> y2u;
   std::vector<double> y3u;
   std::vector<double> y4u;
   std::vector<double> y5u;
+  std::vector<double> l1u;
+  std::vector<double> l3u;
+  std::vector<double> l5u;
+
+  std::vector<double> px;
+  std::vector<double> py;
+  std::vector<double> pa;
 
 
+  std::vector<double> twist;
 
 };
 #endif // SIMUDRIVE_H_

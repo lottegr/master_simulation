@@ -28,8 +28,8 @@ SimulationDrive::~SimulationDrive()
 bool SimulationDrive::init()
 {
   // initialize variables
-  forward_dist_ = 0.3;
-  side_dist_    = 0.3;
+  forward_dist_ = 0.5;
+  side_dist_    = 1;
 
   // initialize publishers
   cmd_vel_pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 10);
@@ -59,12 +59,17 @@ bool SimulationDrive::init()
 
 void SimulationDrive::odomMsgCallBack(const nav_msgs::Odometry::ConstPtr &msg)
 {
+  // pose
   double siny = 2.0 * (msg->pose.pose.orientation.w * msg->pose.pose.orientation.z + msg->pose.pose.orientation.x * msg->pose.pose.orientation.y);
 	double cosy = 1.0 - 2.0 * (msg->pose.pose.orientation.y * msg->pose.pose.orientation.y + msg->pose.pose.orientation.z * msg->pose.pose.orientation.z);  
 
 	pose_odom_rot = atan2(siny, cosy) * RAD2DEG;
   pose_odom_pos_x = msg->pose.pose.position.x;
   pose_odom_pos_y = msg->pose.pose.position.y;
+
+  // twist
+  twist_odom_lin = msg->twist.twist.linear.x;
+  twist_odom_ang = msg->twist.twist.angular.z;
 }
 
 void SimulationDrive::laserScanMsgCallBack(const sensor_msgs::LaserScan::ConstPtr &msg)
@@ -117,7 +122,7 @@ void SimulationDrive::updateCommandVelocity(double linear, double angular)
 }
 
 
-void SimulationDrive::updateIntialPose(double pos_x, double pos_y, double rot_z)
+void SimulationDrive::updateInitialPose(double pos_x, double pos_y, double rot_z)
 {
   geometry_msgs::PoseWithCovarianceStamped init_pose;
 
@@ -166,26 +171,101 @@ void SimulationDrive::updateEnvironment(std::string environment)
 
 
 
+
+// cross function 
+
+void SimulationDrive::cross(int direction, int row)
+{
+  
+// ang-vel. approach
+
+  // ROS_INFO_STREAM(twist_odom_ang);
+
+  // MiniPID pid = MiniPID(1,1,0);
+
+  // double target_ = 0;
+  // double sensor_ = twist_odom_ang;
+
+  // double twist_ang_0 = pid.getOutput(sensor_,target_);
+
+  // updateCommandVelocity(direction*lin_vel, twist_ang_0);
+
+
+
+
+
+// pos. approach
+
+  MiniPID pid = MiniPID(1,0,0);
+
+  double target_ = (row-1)*dist_rows_y;
+  double sensor_ = pose_odom_pos_y;
+
+  double output = pid.getOutput(sensor_,target_);
+
+  double twist_ang_0 = -pose_odom_pos_y;
+
+  updateCommandVelocity(direction*lin_vel, direction*output);
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 // u turn function
 
 void SimulationDrive::makeUturn(int row)
 {
   ros::Time now = ros::Time::now();
 
-  MiniPID pid = MiniPID(1,0,0);
+
+  // MiniPID pid = MiniPID(0.05,0,0.1);
+
+  // // double target_ = (row)*dist_rows_y;
+  // double target_ = dist_rows_y;
+  // double sensor_ = pose_odom_pos_y;
+
+  // double output = pid.getOutput(sensor_,target_);
+
+  // double twist_ang_0 = -pose_odom_pos_y;
+
+  // updateCommandVelocity(lin_vel, output);
+
+
+
+
+
+
+
+
+
+
+
+  MiniPID pid_lin = MiniPID(1,0,0);
+  MiniPID pid_ang = MiniPID(1,0,0);
 
   double target1 = 0;
   double target2 = 90;
-  double target3 = row*0.4;
+  double target3 = row*dist_rows_y;
   double target4;
   double target5;
   
   if (row%2 != 0) {
     target4 = 180;
-    target5 = 0.4;
+    target5 = dist_rows_x;
   } else {
     target4 = 0;
-    target5 = 0.4;
+    target5 = dist_rows_x;
   }
 
   double sensor_x = pose_odom_pos_x;
@@ -194,41 +274,63 @@ void SimulationDrive::makeUturn(int row)
 
 
 
+
+
   if (turn_step == 1)
   {
-    pid.setOutputLimits(-.3,.3);
+    pid_lin = MiniPID(1,5,5);
+    pid_lin.setOutputLimits(-lin_vel,lin_vel);
     double sensor = sensor_x;
     double target = target1;
 
+    pid_ang = MiniPID(1,0,0);
+    double sensor_ = pose_odom_pos_y;
+    double target_ = (row-1)*dist_rows_y;
+    
+
     if ( abs(sensor - target) > 0.01 )
     {
-      double output = pid.getOutput(sensor,target);
-      updateCommandVelocity(output,0); 
+      double output_lin = pid_lin.getOutput(sensor,target);
+      double output_ang = pid_ang.getOutput(sensor_,target_);
+      updateCommandVelocity(output_lin, output_ang); 
       y1.push_back(sensor);
-      y1u.push_back(output);
+      y1u.push_back(output_lin);
+      l1.push_back(sensor_);
+      l1u.push_back(output_ang);
     }
     else
     {
       updateCommandVelocity(0,0);
       write_to_file(y1,"y1");
       write_to_file(y1u,"y1u");
+      write_to_file(l1,"l1");
+      write_to_file(l1u,"l1u");
       ros::Duration(2).sleep();
       turn_step += 1;
     }
   } 
   
+
+
+
+
   else if (turn_step == 2)
   {
-    pid.setOutputLimits(-1,1);
+    pid_ang = MiniPID(0.1,0.5,1);
+    pid_ang.setOutputLimits(-ang_vel,ang_vel);
     double sensor = sensor_rot;
     double target = target2;
 
+    // double sensor_ = pose_odom_rot;
+    // double target_ = 0;
+
     if ( abs(sensor - target) > 0.1 )
     {
-      double output = pid.getOutput(sensor,target);
-      updateCommandVelocity(0,output); 
+      double output_ang = pid_ang.getOutput(sensor,target);
+      // double output_lin = pid_lin.getOutput(sensor_, target_);
+      updateCommandVelocity(0, output_ang); 
       y2.push_back(sensor);
-      y2u.push_back(output);
+      y2u.push_back(output_ang);
     }
     else
     {
@@ -240,32 +342,58 @@ void SimulationDrive::makeUturn(int row)
     }
   }
  
+
+
+
+
+
+
+
+
   else if (turn_step == 3)
   {
-    pid.setOutputLimits(-.3,.3);
+    pid_lin = MiniPID(1,5,5);
+    pid_lin.setOutputLimits(-lin_vel,lin_vel);
     double sensor = sensor_y;
     double target = target3;
 
+    pid_ang = MiniPID(2,0,1);
+    double sensor_ = pose_odom_pos_x;
+    double target_ = 0;
+
     if ( abs(sensor - target) > 0.01 )
     {
-      double output = pid.getOutput(sensor,target);
-      updateCommandVelocity(output,0); 
+      double output_lin = pid_lin.getOutput(sensor,target);
+      double output_ang = pid_ang.getOutput(sensor_,target_);
+      updateCommandVelocity(output_lin, -output_ang); 
       y3.push_back(sensor);
-      y3u.push_back(output);
+      y3u.push_back(output_lin);
+      l3.push_back(sensor_);
+      l3u.push_back(output_ang);
     }
     else
     {
       updateCommandVelocity(0,0); 
       write_to_file(y3,"y3");
       write_to_file(y3u,"y3u");
+      write_to_file(l3,"l3");
+      write_to_file(l3u,"l3u");
       ros::Duration(2).sleep();
       turn_step += 1;
     }
   }
 
+
+
+
+
+
+
+
   else if (turn_step == 4)
   {
-    pid.setOutputLimits(-1,1);
+    pid_ang = MiniPID(0.1,0.5,1);
+    pid_ang.setOutputLimits(-ang_vel,ang_vel);
     double sensor;
     double target = target4;
 
@@ -278,12 +406,17 @@ void SimulationDrive::makeUturn(int row)
       sensor = 360 + sensor_rot;
     }
 
+    // double sensor_ = sensor_lin;
+    // double target_ = 0;
+
+
     if ( abs(sensor - target) > 0.1 )
     {
-      double output = pid.getOutput(sensor,target);
-      updateCommandVelocity(0,output); 
+      double output_ang = pid_ang.getOutput(sensor,target);
+      // double output_lin = pid_lin.getOutput(sensor_, target_);
+      updateCommandVelocity(0, output_ang); 
       y4.push_back(sensor);
-      y4u.push_back(output);
+      y4u.push_back(output_ang);
     }
     else
     {
@@ -295,24 +428,38 @@ void SimulationDrive::makeUturn(int row)
     }
   }
 
+
+
+
+
+
+
   else if (turn_step == 5)
   {
-    pid.setOutputLimits(-.3,.3);
+    pid_lin = MiniPID(1,0,0);
+    pid_lin.setOutputLimits(-lin_vel,lin_vel);
     double sensor = sensor_x;
     double target = target5;
 
+    pid_ang = MiniPID(2,0,0);
+    double sensor_ = pose_odom_pos_y;
+    double target_ = row*dist_rows_y;
+
     if ( abs(sensor - target) > 0.01 )
     {
-      double output = pid.getOutput(sensor,target);
-      updateCommandVelocity(output,0); 
+      double output_lin = pid_lin.getOutput(sensor,target);
+      double output_ang = pid_ang.getOutput(sensor_,target_);
+      updateCommandVelocity(output_lin, -output_ang); 
       y5.push_back(sensor);
-      y5u.push_back(output);
+      y5u.push_back(output_lin);
+      l5.push_back(sensor_);
+      l5u.push_back(output_ang);
     }
-    else if (environment == "rail_f")
-    {
-      write_to_file(y5,"y5");
-      write_to_file(y5u,"y5u");
-    }
+    // else if (environment == "rail_f")
+    // {
+    //   write_to_file(y5,"y5");
+    //   write_to_file(y5u,"y5u");
+    // }
     
     else
     {
@@ -320,6 +467,29 @@ void SimulationDrive::makeUturn(int row)
       ros::Duration(2).sleep();
     }
   } 
+
+
+
+
+
+  // plotting position
+
+  px.push_back(pose_odom_pos_x);
+  py.push_back(pose_odom_pos_y);
+  pa.push_back(pose_odom_rot);
+
+
+
+  write_to_file(px,"px");
+  write_to_file(py,"py");
+  write_to_file(pa,"pa");
+  
+
+
+
+
+
+
 }
 
 
@@ -336,19 +506,20 @@ void SimulationDrive::write_to_file(std::vector<double> v, std::string name)
 {
 
   name = name + ".txt";
-  ROS_INFO_STREAM(name);
-
-
-  std::ofstream outFile(name);
+  
+  std::ofstream outFile;
+  outFile.open(name);
   if (!outFile.is_open()){
-    ROS_INFO_STREAM("fuck");
+    ROS_INFO_STREAM("failed to open file");
   }
   else{
     for (const auto &e : v) outFile << e << "\n";
   }
+  outFile.close();
+
 
   return;
-}1
+}
 
 
 
@@ -439,7 +610,7 @@ bool SimulationDrive::simulationLoop()
         
       break;
 
-// ----------------------------------------------------------------
+// ---------------------------------------------------------------- 
 
     case concrete_turn:
       if (!first) 
@@ -462,16 +633,21 @@ bool SimulationDrive::simulationLoop()
       }
       else
       {
-        updateIntialPose(0,0,0);
-        ros::Duration(2).sleep();
-        updateCommandVelocity(lin_vel, 0.0);
+        // updateInitialPose(0,0,0);
+        // ROS_INFO_STREAM("start");
+        // ros::Duration(5).sleep();
+        // ROS_INFO_STREAM("stop");
+        cross(1,round);
+        // ros::Duration(10).sleep();
+        // ROS_INFO_STREAM("stop2");
         rb_status = get_placement;
       }
       break;
 
 
     case concrete_cross:
-      updateCommandVelocity(-lin_vel, 0.0);
+      cross(-1,round);
+      // updateCommandVelocity(-lin_vel, 0.0);
       rb_status = get_placement;
       break;
 

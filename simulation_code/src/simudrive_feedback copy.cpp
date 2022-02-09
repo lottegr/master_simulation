@@ -120,7 +120,7 @@ void SimulationDrive::updateCommandVelocity(double linear, double angular)
 }
 
 
-void SimulationDrive::updateIntialPose(double pos_x, double pos_y, double rot_z)
+void SimulationDrive::updateInitialPose(double pos_x, double pos_y, double rot_z)
 {
   geometry_msgs::PoseWithCovarianceStamped init_pose;
 
@@ -497,8 +497,10 @@ bool SimulationDrive::simulationLoop()
       }
       else
       {
-        updateIntialPose(0,0,0);
-        ros::Duration(2).sleep();
+        updateInitialPose(0,0,0);
+        ROS_INFO_STREAM("start");
+        ros::Duration(5).sleep();
+        ROS_INFO_STREAM("stop")
         updateCommandVelocity(lin_vel, 0.0);
         rb_status = get_placement;
       }
