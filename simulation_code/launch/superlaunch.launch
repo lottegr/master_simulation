@@ -8,4 +8,6 @@
 
     <node name="$(arg nav_node)" pkg="simulation_code" type="$(arg nav_node)" output="screen"/>
     <node name="localize" pkg="simulation_code" type="localize" output="screen"/>
+    <node name="coll_avoid" pkg="simulation_code" type="coll_avoid" output="screen"/>
+    <node name="environment" pkg="simulation_code" type="environment" output="screen"/>
 </launch>

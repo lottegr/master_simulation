@@ -1,21 +1,3 @@
-/*******************************************************************************
-* Copyright 2016 ROBOTIS CO., LTD.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*******************************************************************************/
-
-/* Authors: Taehun Lim (Darby) */
-
 #ifndef SIMUDRIVE_H_
 #define SIMUDRIVE_H_
 
@@ -27,7 +9,6 @@
 #include <sensor_msgs/LaserScan.h>
 #include <geometry_msgs/Twist.h>
 #include <nav_msgs/Odometry.h>
-#include <std_msgs/Bool.h>
 
 #include "geometry_msgs/Pose.h"
 #include "geometry_msgs/PoseStamped.h"
@@ -55,23 +36,14 @@
 #define backward  2
 #define right     3
 
-#define get_placement   0 
-#define concrete_cross  1 
-#define concrete_turn   2
-#define rail_f          3
-#define rail_b          4
-#define rail_end_f      5
-#define rail_end_b      6
 
 
 
-
-
-class SimulationDrive
+class Environment
 {
  public:
-  SimulationDrive();
-  ~SimulationDrive();
+  Environment();
+  ~Environment();
   bool init();
   bool controlLoop();
   bool simulationLoop();
@@ -87,9 +59,6 @@ class SimulationDrive
   ros::Time begin;
 
   // ROS Topic Publishers
-  ros::Publisher cmd_vel_pub_;
-  ros::Publisher goal_pub_;
-  ros::Publisher init_pose_pub_;
   ros::Publisher env_pub_;
 
   // ROS Topic Subscribers
@@ -99,15 +68,13 @@ class SimulationDrive
   ros::Subscriber pose_sub_;
   ros::Subscriber move_base_status_sub_;
   ros::Subscriber localization_sub_;
-  ros::Subscriber environment_sub_;
-  ros::Subscriber obstacle_sub_;
 
   // ROS Action Clients
   typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> status_client_;
 
   // Variables
-  double forward_dist_;
-  double side_dist_;
+  double forward_dist_ = 0.6;
+  double side_dist_ = 1;
 
   double scan_data_[4] = {10,10,10,10};
 
@@ -124,8 +91,6 @@ class SimulationDrive
   double pose_goal_y;
   double row_;
   std::string section_;
-  std::string env_;
-  bool obst_;
 
   bool drive_f = true;
   bool drive_b = false;
@@ -144,41 +109,6 @@ class SimulationDrive
   void odomMsgCallBack(const nav_msgs::Odometry::ConstPtr &msg);
   void poseMsgCallBack(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr &msg);
   void localizationCallBack(const simulation_code::LocalizationConstPtr &msg);
-  void environmentCallBack(const std_msgs::StringConstPtr &msg);
-  void obstacleCallBack(const std_msgs::Bool::ConstPtr &msg);
-
-
-
-  void cross(int direction, int row);
-  void makeUturn(int round);
-  // void uturn();
-  void write_to_file(std::vector<double> v, std::string name);
-
-  // std::ofstream outFile;
-  std::vector<double> y1;
-  std::vector<double> y2;
-  std::vector<double> y3;
-  std::vector<double> y4;
-  std::vector<double> y5;
-  std::vector<double> l1;
-  std::vector<double> l3;
-  std::vector<double> l5;
-
-  std::vector<double> y1u;
-  std::vector<double> y2u;
-  std::vector<double> y3u;
-  std::vector<double> y4u;
-  std::vector<double> y5u;
-  std::vector<double> l1u;
-  std::vector<double> l3u;
-  std::vector<double> l5u;
-
-  std::vector<double> px;
-  std::vector<double> py;
-  std::vector<double> pa;
-
-
-  std::vector<double> twist;
 
 };
 #endif // SIMUDRIVE_H_

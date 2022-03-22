@@ -64,3 +64,15 @@ add_dependencies(simudrive_feedback ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin
 add_executable(localize src/localize.cpp)
 target_link_libraries(localize ${catkin_LIBRARIES})
 add_dependencies(localize ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+add_executable(coll_avoid src/coll_avoid.cpp)
+target_link_libraries(coll_avoid ${catkin_LIBRARIES})
+add_dependencies(coll_avoid ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+add_executable(environment src/environment.cpp)
+target_link_libraries(environment ${catkin_LIBRARIES})
+add_dependencies(environment ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+add_executable(sensors src/sensors.cpp)
+target_link_libraries(sensors ${catkin_LIBRARIES})
+add_dependencies(sensors ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})

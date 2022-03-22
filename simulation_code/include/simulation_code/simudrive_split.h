@@ -27,7 +27,6 @@
 #include <sensor_msgs/LaserScan.h>
 #include <geometry_msgs/Twist.h>
 #include <nav_msgs/Odometry.h>
-#include <std_msgs/Bool.h>
 
 #include "geometry_msgs/Pose.h"
 #include "geometry_msgs/PoseStamped.h"
@@ -99,8 +98,6 @@ class SimulationDrive
   ros::Subscriber pose_sub_;
   ros::Subscriber move_base_status_sub_;
   ros::Subscriber localization_sub_;
-  ros::Subscriber environment_sub_;
-  ros::Subscriber obstacle_sub_;
 
   // ROS Action Clients
   typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> status_client_;
@@ -124,15 +121,13 @@ class SimulationDrive
   double pose_goal_y;
   double row_;
   std::string section_;
-  std::string env_;
-  bool obst_;
 
   bool drive_f = true;
   bool drive_b = false;
   bool first = true;
   int turns;
   int round = 1;
-  int turn_step = 1;
+  int turn_step = 2;
 
   // Functions
   void updateCommandVelocity(double linear, double angular);
@@ -144,12 +139,9 @@ class SimulationDrive
   void odomMsgCallBack(const nav_msgs::Odometry::ConstPtr &msg);
   void poseMsgCallBack(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr &msg);
   void localizationCallBack(const simulation_code::LocalizationConstPtr &msg);
-  void environmentCallBack(const std_msgs::StringConstPtr &msg);
-  void obstacleCallBack(const std_msgs::Bool::ConstPtr &msg);
-
-
-
+  
   void cross(int direction, int row);
+  void Uturn1(int round);
   void makeUturn(int round);
   // void uturn();
   void write_to_file(std::vector<double> v, std::string name);

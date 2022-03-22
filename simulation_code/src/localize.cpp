@@ -6,7 +6,7 @@ Localization::Localization()
   : nh_priv_("~")
 {
   //Init gazebo ros turtlebot3 node
-  ROS_INFO("Running simudrive node");
+  ROS_INFO("Running localize node");
   auto ret = init();
   ROS_ASSERT(ret);
 }
@@ -93,23 +93,23 @@ bool Localization::simulationLoop()
     switch(find_row)
     {
       case 0:
-        // ROS_INFO_STREAM(pose_pos_y);
-        if (abs(pose_pos_y) < error_)
+        // ROS_INFO_STREAM(pose_odom_pos_y);
+        if (abs(pose_odom_pos_y) < error_)
         {
           find_row = 1;
           // ROS_INFO_STREAM("row1");
         }
-        else if (abs(pose_pos_y - row2) < error_)
+        else if (abs(pose_odom_pos_y - row2) < error_)
         {
           find_row = 2;
           // ROS_INFO_STREAM("row2");
         }
-        else if (abs(pose_pos_y - row3) < error_)
+        else if (abs(pose_odom_pos_y - row3) < error_)
         {
           find_row = 3;
           // ROS_INFO_STREAM("row3");
         }
-        else if (abs(pose_pos_y - row4) < error_)
+        else if (abs(pose_odom_pos_y - row4) < error_)
         {
           find_row = 4;
           // ROS_INFO_STREAM("row4");
@@ -141,32 +141,32 @@ bool Localization::simulationLoop()
     {
       
       case 0:
-        if (pose_pos_x < secA)
+        if (pose_odom_pos_x < secA)
         {
           find_section = 1;
           // ROS_INFO_STREAM("secA");
         }
-        else if (pose_pos_x < secB && pose_pos_x > secA)
+        else if (pose_odom_pos_x < secB && pose_odom_pos_x > secA)
         {
           find_section = 2;
           // ROS_INFO_STREAM("secB");
         }
-        else if (pose_pos_x < secC && pose_pos_x > secB)
+        else if (pose_odom_pos_x < secC && pose_odom_pos_x > secB)
         {
           find_section = 3;
           // ROS_INFO_STREAM("secC");
         }
-        else if (pose_pos_x > secD && pose_pos_x < secE)
+        else if (pose_odom_pos_x > secD && pose_odom_pos_x < secE)
         {
           find_section = 4;
           // ROS_INFO_STREAM("secD");
         }
-        else if (pose_pos_x > secE && pose_pos_x < secF)
+        else if (pose_odom_pos_x > secE && pose_odom_pos_x < secF)
         {
           find_section = 5;
           // ROS_INFO_STREAM("secE");
         }
-        else if (pose_pos_x > secF)
+        else if (pose_odom_pos_x > secF)
         {
           find_section = 6;
           // ROS_INFO_STREAM("secF");

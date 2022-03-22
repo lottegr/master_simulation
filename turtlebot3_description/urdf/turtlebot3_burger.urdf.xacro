@@ -110,8 +110,8 @@
     <collision>
       <origin xyz="0 0.001 0" rpy="0 0 0"/>
       <geometry>
-        <sphere radius="0.004"/>
-        <!-- <box size="0.030 0.009 0.020"/> -->
+        <!-- <sphere radius="0.004"/> -->
+        <box size="0.030 0.009 0.020"/>
       </geometry>
     </collision>
 
