@@ -141,7 +141,7 @@ bool CollisionAvoid::simulationLoop()
 {
   // begin = ros::Time::now();
 
-  if ((scan_data_[0] < 0.5 && cmd_lin_ >= 0) || (scan_data_[2] < 0.5 && cmd_lin_ <= 0)) 
+  if ((scan_data_[0] < 0.4 && cmd_lin_ >= 0) || (scan_data_[2] < 0.4 && cmd_lin_ <= 0)) 
   // if ((scan_data_[0] < 0.5) || (scan_data_[2] < 0.5)) 
   {
 

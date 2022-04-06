@@ -1,0 +1,27 @@
+<launch>
+
+    <arg name="nav_node" default="simudrive_feedback"/>
+    <!-- roslaunch simulation_code superlaunch.launch nav_node:="NAME" -->
+    <arg name="initial_pose_x" default="0.0"/>
+    <arg name="initial_pose_y" default="0.0"/>
+    <arg name="initial_pose_a" default="0.0"/>
+    <arg name="x_pos" default="0.0"/>
+    <arg name="y_pos" default="0.0"/>
+    <arg name="z_pos" default="0.0"/>
+
+    <include file="$(find turtlebot3_gazebo)/launch/turtlebot3_empty_world.launch">
+        <arg name="x_pos" value="$(arg x_pos)"/>
+        <arg name="y_pos" value="$(arg y_pos)"/>
+        <arg name="z_pos" value="$(arg z_pos)"/>
+    </include>  
+    <!-- <include file="$(find turtlebot3_navigation)/launch/turtlebot3_navigation.launch">
+        <arg name="initial_pose_x" value="$(arg initial_pose_x)"/>
+        <arg name="initial_pose_y" value="$(arg initial_pose_y)"/>
+        <arg name="initial_pose_a" value="$(arg initial_pose_a)"/>
+    </include> -->
+
+    <node name="$(arg nav_node)" pkg="simulation_code" type="$(arg nav_node)" output="screen"/>
+    <node name="localize" pkg="simulation_code" type="localize" output="screen"/>
+    <node name="coll_avoid" pkg="simulation_code" type="coll_avoid" output="screen"/>
+    <node name="environment" pkg="simulation_code" type="environment" output="screen"/>
+</launch>

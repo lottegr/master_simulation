@@ -1,7 +1,6 @@
 #include "simulation_code/simudrive.h"
-#include "simulation_code/rows_and_sections.h"
-#include "pid/pid.h"
-#include "pid/pid.cpp"
+#include "MiniPID/MiniPID.h"
+#include "MiniPID/MiniPID.cpp"
 #include <vector>
 #include <fstream>
 #include <iostream>
@@ -185,19 +184,50 @@ void SimulationDrive::updateEnvironment(std::string environment)
 
 
 
-double SimulationDrive::rotate(double sensor, double target, bool over180)
+// cross function 
+
+void SimulationDrive::cross(int direction, int row)
 {
-  PID pid_ang = PID(0.1,ang_vel,-ang_vel, 0.01, 0.005, 0.05);
+// ang-vel. approach
+  // ROS_INFO_STREAM(twist_odom_ang);
+  // MiniPID pid = MiniPID(1,1,0);
+  // double target_ = 0;
+  // double sensor_ = twist_odom_ang;
+  // double twist_ang_0 = pid.getOutput(sensor_,target_);
+  // updateCommandVelocity(direction*lin_vel, twist_ang_0);
 
-  if (over180){
-    if (pose_odom_rot > 0){
-      sensor = sensor;
-    } else {
-      sensor = 360 + sensor;
-    }
+
+
+// pos. approach
+  MiniPID pid = MiniPID(1,2,0);
+
+  double target_ = (row-1)*dist_rows_y;
+  double sensor_ = pose_odom_pos_y;
+
+  double output = pid.getOutput(sensor_,target_);
+
+  // ROS_INFO_STREAM(sensor_ << "   " << output);
+
+  if (row%2 == 1)
+  {
+    updateCommandVelocity(direction*lin_vel, direction*output);
   }
+  else 
+  {
+    updateCommandVelocity(direction*lin_vel, -direction*output);
+  }
+  
+}
 
-  double output_ang = pid_ang.calculate(target, sensor);
+
+
+
+double SimulationDrive::rotate(int dir, double sensor, double target)
+{
+  MiniPID pid_ang = MiniPID(0.1,0.5,1);
+  pid_ang.setOutputLimits(-ang_vel,ang_vel);
+
+  double output_ang = pid_ang.getOutput(sensor,target);
   updateCommandVelocity(0, output_ang); 
 
   return output_ang;
@@ -209,11 +239,12 @@ double SimulationDrive::driveStraight(int dir, double sensor_lin, double target_
 {
   if (target_pos)
   {
-    PID pid_lin = PID(0.1,lin_vel,-lin_vel, 1, 0.05, 0.5);
-    PID pid_ang = PID(0.1,ang_vel,-ang_vel, 1, 0.05, 0);         // droppe D-term ??
+    MiniPID pid_lin = MiniPID(1,5,5);
+    pid_lin.setOutputLimits(-lin_vel,lin_vel);
+    MiniPID pid_ang = MiniPID(1,2,0);             // droppe D-term ??
     
-    double output_lin = pid_lin.calculate(target_lin,sensor_lin);
-    double output_ang = pid_ang.calculate(target_ang,sensor_ang);
+    double output_lin = pid_lin.getOutput(sensor_lin,target_lin);
+    double output_ang = pid_ang.getOutput(sensor_ang,target_ang);
     if (dir == 1){
       updateCommandVelocity(output_lin, output_ang); 
     } else if (dir == 0) {
@@ -227,8 +258,10 @@ double SimulationDrive::driveStraight(int dir, double sensor_lin, double target_
 
   else
   {
-    PID pid = PID(0.1,ang_vel,-ang_vel, 1, 0.05, 0);
-    double output = pid.calculate(target_ang,sensor_ang);
+    MiniPID pid = MiniPID(1,2,0);
+    double output = pid.getOutput(sensor_ang,target_ang);
+
+    // ROS_INFO_STREAM(sensor_ << "   " << output);
 
     if (dir == 1)
     {
@@ -239,7 +272,7 @@ double SimulationDrive::driveStraight(int dir, double sensor_lin, double target_
       updateCommandVelocity(direction*lin_vel, -direction*output);
     }
   }
-
+  
 }
 
 
@@ -253,12 +286,14 @@ double SimulationDrive::driveStraight(int dir, double sensor_lin, double target_
 void SimulationDrive::makeUturn(int row)
 {
   // variables
+  MiniPID pid_lin = MiniPID(1,0,0);
+  MiniPID pid_ang = MiniPID(1,0,0);
+
   double target1 = 0;
   double target2 = 90;
   double target3 = row*dist_rows_y;
   double target4;
   double target5;
-  bool over180;
   
   if (row%2 != 0) {
     target4 = 180;
@@ -316,15 +351,16 @@ void SimulationDrive::makeUturn(int row)
       double target = target2;
 
       if (row%2 == 0){
-        over180 = true;
-      } else {
-        over180 = false;
+        if (pose_odom_rot > 0){
+          sensor = sensor_rot;
+        } else {
+          sensor = 360 + sensor_rot;
+        }
       }
-
 
       if ( abs(sensor - target) > 0.1 )
       {
-        double output_ang = rotate(sensor,target,over180);
+        double output_ang = rotate(1,sensor,target);
         y2.push_back(sensor);
         y2u.push_back(output_ang);
       }
@@ -379,14 +415,16 @@ void SimulationDrive::makeUturn(int row)
     double target = target4;
 
     if (row%2 == 1){
-      over180 = true;
-    } else {
-      over180 = false;
+      if (pose_odom_rot > 0){
+        sensor = sensor_rot;
+      } else {
+        sensor = 360 + sensor_rot;
+      }
     }
 
     if ( abs(sensor - target) > 0.1 )
     {
-      double output_ang = rotate(sensor,target, over180);
+      double output_ang = rotate(1,sensor,target);
       updateCommandVelocity(0, output_ang); 
       y4.push_back(sensor);
       y4u.push_back(output_ang);
@@ -505,113 +543,7 @@ void SimulationDrive::write_to_file(std::vector<double> v, std::string name)
 
 bool SimulationDrive::simulationLoop()
 {
-  static uint8_t rb_status = 0;
-  
-  
-
-  if (!obst_)
-  {
-    switch(rb_status)
-    {
-      case get_placement:
-        if (env_ == "rail_f")
-        {
-          // ROS_INFO_STREAM("railf");
-          rb_status = rail_f;
-        }
-        else if (env_ == "rail_b")
-        {
-          // ROS_INFO_STREAM("railb");
-          rb_status = rail_b;
-        }
-        else if (env_ == "concrete_turn") 
-        {
-          // ROS_INFO_STREAM("turn");
-          rb_status = concrete_turn;
-        }
-        else if (env_ == "concrete_cross") 
-        {
-          // ROS_INFO_STREAM("cross");
-          rb_status = concrete_cross;
-        }
-        else if (env_ == "end_f") 
-        {
-          rb_status = rail_end_f;
-        }
-        else if (env_ == "end_b")
-        {
-          rb_status = rail_end_b;
-        }
-
-        break;
-
-  // ---------------------------------------------------------------- 
-
-      case concrete_turn:
-        if (!first) 
-        {
-          if (round < 5)
-          {
-            begin = ros::Time::now();
-            makeUturn(round);
-            rb_status = get_placement;
-            break;
-
-          } 
-          else
-          {
-            updateNavigationGoal(0, 0, 0);
-            ROS_INFO_STREAM("Simulation ended");
-          }
-        }
-        else
-        {
-          // cross(1,round);
-          driveStraight(round%2,0,0,pose_odom_pos_y,(round-1)*dist_rows_y,false,1);
-          rb_status = get_placement;
-        }
-        break;
-
-
-      case concrete_cross:
-        // cross(-1,round);
-        driveStraight(round%2,0,0,pose_odom_pos_y,(round-1)*dist_rows_y,false,-1);
-        rb_status = get_placement;
-        break;
-
-      case rail_f:    // ROS_INFO_STREAM(sensor_ << "   " << output);
-        updateCommandVelocity(lin_vel, 0.0);
-        first = false;
-        turn_step = 1;
-        rb_status = get_placement;
-        break;
-
-      case rail_b:
-        updateCommandVelocity(-lin_vel, 0.0);
-        rb_status = get_placement;
-        break;
-
-      case rail_end_f:
-        updateCommandVelocity(-lin_vel, 0.0);
-        rb_status = get_placement;
-        break;
-
-      case rail_end_b:
-        updateCommandVelocity(lin_vel, 0.0);
-        rb_status = get_placement;
-        break;
-
-      default:
-        rb_status = get_placement;
-        break;
-    }
-  }
-  else
-  {
-    updateCommandVelocity(0,0);
-  }
-
-  return true;
+    driveStraight(round%2,0,0,pose_odom_pos_y,(round-1)*dist_rows_y,false,1);
 }
 
 

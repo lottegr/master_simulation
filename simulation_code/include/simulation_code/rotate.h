@@ -1,24 +1,3 @@
-/*******************************************************************************
-* Copyright 2016 ROBOTIS CO., LTD.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*******************************************************************************/
-
-/* Authors: Taehun Lim (Darby) */
-
-#ifndef SIMUDRIVE_H_
-#define SIMUDRIVE_H_
-
 #include <ros/ros.h>
 #include <math.h>
 
@@ -67,14 +46,16 @@
 
 
 
-class SimulationDrive
+class Rotate
 {
  public:
-  SimulationDrive();
-  ~SimulationDrive();
+  Rotate();
+  ~Rotate();
   bool init();
   bool controlLoop();
   bool simulationLoop();
+  void rotation(int row, double sensor, double target);
+
 
  private:
   // ROS NodeHandle
@@ -136,7 +117,6 @@ class SimulationDrive
   int turns;
   int round = 1;
   int turn_step = 1;
-  int i = 0;
 
   // Functions
   void updateCommandVelocity(double linear, double angular);
@@ -151,14 +131,11 @@ class SimulationDrive
   void environmentCallBack(const std_msgs::StringConstPtr &msg);
   void obstacleCallBack(const std_msgs::Bool::ConstPtr &msg);
 
-
-
   void cross(int direction, int row);
-  double rotate(double sensor, double target, bool over180);
-  double driveStraight(int dir, double sensor_lin, double target_lin, double sensor_ang, double target_ang, bool target_pos, int direction);
   void makeUturn(int round);
   // void uturn();
   void write_to_file(std::vector<double> v, std::string name);
+
 
   // std::ofstream outFile;
   std::vector<double> y1;
@@ -187,4 +164,3 @@ class SimulationDrive
   std::vector<double> twist;
 
 };
-#endif // SIMUDRIVE_H_

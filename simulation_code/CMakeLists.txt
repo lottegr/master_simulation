@@ -56,6 +56,7 @@ add_executable(simudrive_goal src/simudrive_goal.cpp)
 target_link_libraries(simudrive_goal ${catkin_LIBRARIES})
 add_dependencies(simudrive_goal ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
+# ----------------------------------------------------------------------------------------------------- new after spezialization project
 
 add_executable(simudrive_feedback src/simudrive_feedback.cpp)
 target_link_libraries(simudrive_feedback ${catkin_LIBRARIES})
@@ -76,3 +77,15 @@ add_dependencies(environment ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORT
 add_executable(sensors src/sensors.cpp)
 target_link_libraries(sensors ${catkin_LIBRARIES})
 add_dependencies(sensors ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+add_executable(drive_straight src/exp_drive_straight.cpp)
+target_link_libraries(drive_straight ${catkin_LIBRARIES})
+add_dependencies(drive_straight ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+add_executable(u_turn src/exp_u_turn.cpp)
+target_link_libraries(u_turn ${catkin_LIBRARIES})
+add_dependencies(u_turn ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+add_executable(exit_enter_turn src/exp_exit_enter_turn.cpp)
+target_link_libraries(exit_enter_turn ${catkin_LIBRARIES})
+add_dependencies(exit_enter_turn ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
