@@ -65,10 +65,10 @@ class Sensors
   // ROS Topic Subscribers
   ros::Subscriber laser_scan_sub_;
   ros::Subscriber odom_sub_;
-
   ros::Subscriber pose_sub_;
   ros::Subscriber localization_sub_;
   ros::Subscriber imu_sub_;
+  ros::Subscriber odom_filter_sub_;
 
   // Variables
   double scan_data_[4] = {10,10,10,10};
@@ -82,6 +82,9 @@ class Sensors
   double pose_imu_rot;
   // double pose_imu_pos_x;
   // double pose_imu_pos_y; 
+  double pose_odom_f_rot;
+  double pose_odom_f_pos_x;
+  double pose_odom_f_pos_y;
 
   double pose_pos_x;
   double pose_pos_y;
@@ -109,7 +112,8 @@ class Sensors
   void odomMsgCallBack(const nav_msgs::Odometry::ConstPtr &msg);
   void poseMsgCallBack(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr &msg);
   void localizationCallBack(const simulation_code::LocalizationConstPtr &msg);
-  void sensorsCallBack(const sensor_msgs::Imu::ConstPtr &msg);
+  void imuCallBack(const sensor_msgs::Imu::ConstPtr &msg);
+  void odomFilterCallBack(const nav_msgs::Odometry::ConstPtr &msg);
 
   void write_to_file(std::vector<double> v, std::string name);
 
@@ -122,6 +126,9 @@ class Sensors
   // std::vector<double> imu_x;
   // std::vector<double> imu_y;
   std::vector<double> imu_rot;
+  std::vector<double> odom_f_x;
+  std::vector<double> odom_f_y;
+  std::vector<double> odom_f_rot;
 
   std::vector<double> pose_x;
   std::vector<double> pose_y;

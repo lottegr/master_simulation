@@ -156,6 +156,8 @@ class SimulationDrive
   void cross(int direction, int row);
   double rotate(double sensor, double target, bool over180);
   double driveStraight(int dir, double sensor_lin, double target_lin, double sensor_ang, double target_ang, bool target_pos, int direction);
+  double driveStraight2(int dir, double sensor_lin, double target_lin, double sensor_ang, double target_ang);
+
   void makeUturn(int round);
   // void uturn();
   void write_to_file(std::vector<double> v, std::string name);
@@ -185,6 +187,9 @@ class SimulationDrive
 
 
   std::vector<double> twist;
+
+
+  double output_ang_prev = 0;
 
 };
 #endif // SIMUDRIVE_H_

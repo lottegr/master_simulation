@@ -28,7 +28,8 @@ bool Sensors::init()
   laser_scan_sub_  = nh_.subscribe("scan", 10, &Sensors::laserScanMsgCallBack, this);
   odom_sub_ = nh_.subscribe("odom", 10, &Sensors::odomMsgCallBack, this);
   pose_sub_ = nh_.subscribe("/amcl_pose", 10, &Sensors::poseMsgCallBack, this);
-  imu_sub_ = nh_.subscribe("/imu", 10, &Sensors::sensorsCallBack, this);
+  imu_sub_ = nh_.subscribe("/imu", 10, &Sensors::imuCallBack, this);
+  odom_filter_sub_ = nh_.subscribe("odometry/filtered", 10, &Sensors::odomFilterCallBack, this);
   
 
   return true;
@@ -78,7 +79,7 @@ void Sensors::poseMsgCallBack(const geometry_msgs::PoseWithCovarianceStamped::Co
 }
 
 
-void Sensors::sensorsCallBack(const sensor_msgs::Imu::ConstPtr &msg)
+void Sensors::imuCallBack(const sensor_msgs::Imu::ConstPtr &msg)
 {
     double siny = 2.0 * (msg->orientation.w * msg->orientation.z + msg->orientation.x * msg->orientation.y);
     double cosy = 1.0 - 2.0 * (msg->orientation.y * msg->orientation.y + msg->orientation.z * msg->orientation.z);  
@@ -88,6 +89,16 @@ void Sensors::sensorsCallBack(const sensor_msgs::Imu::ConstPtr &msg)
     // pose_imu_pos_y = msg->orientation.y;
 }
 
+
+void Sensors::odomFilterCallBack(const nav_msgs::Odometry::ConstPtr &msg)
+{
+    double siny = 2.0 * (msg->pose.pose.orientation.w * msg->pose.pose.orientation.z + msg->pose.pose.orientation.x * msg->pose.pose.orientation.y);
+    double cosy = 1.0 - 2.0 * (msg->pose.pose.orientation.y * msg->pose.pose.orientation.y + msg->pose.pose.orientation.z * msg->pose.pose.orientation.z);  
+
+    pose_odom_f_rot = atan2(siny, cosy) * RAD2DEG;
+    pose_odom_f_pos_x = msg->pose.pose.position.x;
+    pose_odom_f_pos_y = msg->pose.pose.position.y;
+}
 
 
 // publishers
@@ -203,6 +214,9 @@ bool Sensors::simulationLoop()
   amcl_y.push_back(pose_amcl_pos_y);
   amcl_rot.push_back(pose_amcl_rot);
   imu_rot.push_back(pose_imu_rot);
+  odom_f_x.push_back(pose_odom_f_pos_x);
+  odom_f_y.push_back(pose_odom_f_pos_y);
+  odom_f_rot.push_back(pose_odom_f_rot);
 
   write_to_file(odom_x,"odom_x");
   write_to_file(odom_y,"odom_y");
@@ -211,6 +225,9 @@ bool Sensors::simulationLoop()
   write_to_file(amcl_y,"amcl_y");
   write_to_file(amcl_rot,"amcl_rot");
   write_to_file(imu_rot,"imu_rot");
+  write_to_file(odom_f_x,"odom_f_x");
+  write_to_file(odom_f_y,"odom_f_y");
+  write_to_file(odom_f_rot,"odom_f_rot");
 
   // write_to_file(pose_x,"pose_x");
   // write_to_file(pose_y,"pose_y");
