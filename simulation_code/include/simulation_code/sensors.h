@@ -80,8 +80,12 @@ class Sensors
   double pose_amcl_pos_x;
   double pose_amcl_pos_y;
   double pose_imu_rot;
-  // double pose_imu_pos_x;
-  // double pose_imu_pos_y; 
+  double pose_imu_pos_xdotdot;
+  double pose_imu_pos_ydotdot; 
+  double pose_imu_pos_xdot;
+  double pose_imu_pos_ydot;
+  double pose_imu_pos_x;
+  double pose_imu_pos_y;
   double pose_odom_f_rot;
   double pose_odom_f_pos_x;
   double pose_odom_f_pos_y;
@@ -123,8 +127,8 @@ class Sensors
   std::vector<double> amcl_x;
   std::vector<double> amcl_y;
   std::vector<double> amcl_rot;
-  // std::vector<double> imu_x;
-  // std::vector<double> imu_y;
+  std::vector<double> imu_x;
+  std::vector<double> imu_y;
   std::vector<double> imu_rot;
   std::vector<double> odom_f_x;
   std::vector<double> odom_f_y;

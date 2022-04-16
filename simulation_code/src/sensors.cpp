@@ -29,7 +29,7 @@ bool Sensors::init()
   odom_sub_ = nh_.subscribe("odom", 10, &Sensors::odomMsgCallBack, this);
   pose_sub_ = nh_.subscribe("/amcl_pose", 10, &Sensors::poseMsgCallBack, this);
   imu_sub_ = nh_.subscribe("/imu", 10, &Sensors::imuCallBack, this);
-  odom_filter_sub_ = nh_.subscribe("odometry/filtered", 10, &Sensors::odomFilterCallBack, this);
+  odom_filter_sub_ = nh_.subscribe("odometry/filtered_odom", 10, &Sensors::odomFilterCallBack, this);
   
 
   return true;
@@ -85,8 +85,8 @@ void Sensors::imuCallBack(const sensor_msgs::Imu::ConstPtr &msg)
     double cosy = 1.0 - 2.0 * (msg->orientation.y * msg->orientation.y + msg->orientation.z * msg->orientation.z);  
 
     pose_imu_rot = atan2(siny, cosy) * RAD2DEG;
-    // pose_imu_pos_x = msg->orientation.x;
-    // pose_imu_pos_y = msg->orientation.y;
+    pose_imu_pos_xdotdot = msg->linear_acceleration.x;
+    pose_imu_pos_ydotdot = msg->linear_acceleration.y;
 }
 
 
@@ -229,6 +229,29 @@ bool Sensors::simulationLoop()
   write_to_file(odom_f_y,"odom_f_y");
   write_to_file(odom_f_rot,"odom_f_rot");
 
+
+
+// ------------------------
+  // double dt = 0.1;
+
+  // pose_imu_pos_xdot += pose_imu_pos_xdotdot*dt;
+  // pose_imu_pos_x += pose_imu_pos_xdot*dt;
+
+  // imu_x.push_back(pose_imu_pos_x);
+  // write_to_file(imu_x,"imu_x");
+
+  // pose_imu_pos_ydot += pose_imu_pos_ydotdot*dt;
+  // pose_imu_pos_y += pose_imu_pos_ydot*dt;
+
+  // imu_y.push_back(pose_imu_pos_y);
+  // write_to_file(imu_y,"imu_y");
+
+
+
+
+
+
+
   // write_to_file(pose_x,"pose_x");
   // write_to_file(pose_y,"pose_y");
   // write_to_file(pose_rot,"pose_rot");
@@ -250,7 +273,7 @@ int main(int argc, char* argv[])
   ros::init(argc, argv, "sensors");
   Sensors sensors;
 
-  ros::Rate loop_rate(125);
+  ros::Rate loop_rate(10);
 
   while (ros::ok())
   {

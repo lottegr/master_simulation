@@ -321,8 +321,8 @@ bool SimulationDrive::simulationLoop()
     {
         if ( abs(sensor_goal[i] - target_goal[i]) > 0.05 )
         {
-            ROS_INFO_STREAM(sensor_goal[i] << "   " << target_goal[i]);
-            ROS_INFO_STREAM(sensor_line[i] << "   " << target_line[i]);
+            // ROS_INFO_STREAM(sensor_goal[i] << "   " << target_goal[i]);
+            // ROS_INFO_STREAM(sensor_line[i] << "   " << target_line[i]);
             driveStraight(dirs[i],sensor_goal[i],target_goal[i],sensor_line[i],target_line[i]);
         
         }
