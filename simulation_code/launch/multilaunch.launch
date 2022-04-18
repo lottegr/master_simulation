@@ -2,9 +2,31 @@
 
     <arg name="nav_node" default="simudrive_feedback"/>
     <!-- roslaunch simulation_code multilaunch.launch nav_node:="NAME" -->
+    <arg name="sensor_fusion" default="false"/>
 
     <include file="$(find turtlebot3_gazebo)/launch/rail.launch" />
     <include file="$(find turtlebot3_navigation)/launch/turtlebot3_navigation.launch" />
+    
+    <group if="$(arg sensor_fusion)">
+        <include file="$(find robot_localization)/launch/ekf_double.launch"/>
+        <!-- <node name="sensors" pkg="simulation_code" type="sensors" output="screen"/> -->
+        <node name="pose_x_plot" pkg="rqt_plot" type="rqt_plot" 
+              args="/odom/pose/pose/position/x 
+                    /amcl_pose/pose/pose/position/x
+                    /odometry/filtered_odom/pose/pose/position/x
+                    /odometry/filtered_map/pose/pose/position/x"/>
+        <node name="pose_y_plot" pkg="rqt_plot" type="rqt_plot" 
+              args="/odom/pose/pose/position/y 
+                    /amcl_pose/pose/pose/position/y
+                    /odometry/filtered_odom/pose/pose/position/y
+                    /odometry/filtered_map/pose/pose/position/y"/>
+        <node name="pose_z_plot" pkg="rqt_plot" type="rqt_plot" 
+              args="/odom/pose/pose/orientation/z 
+                    /amcl_pose/pose/pose/orientation/z 
+                    /odometry/filtered_odom/pose/pose/orientation/z 
+                    /odometry/filtered_map/pose/pose/orientation/z 
+                    /imu/orinetation/z"/>
+    </group>
 
     <node name="$(arg nav_node)" pkg="simulation_code" type="$(arg nav_node)" output="screen"/>
     <node name="localize" pkg="simulation_code" type="localize" output="screen"/>
