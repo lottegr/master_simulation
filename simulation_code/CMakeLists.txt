@@ -78,6 +78,10 @@ add_executable(sensors src/sensors.cpp)
 target_link_libraries(sensors ${catkin_LIBRARIES})
 add_dependencies(sensors ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
+add_executable(odom_switch src/odom_switch.cpp)
+target_link_libraries(odom_switch ${catkin_LIBRARIES})
+add_dependencies(odom_switch ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
 add_executable(drive_straight src/exp_drive_straight.cpp)
 target_link_libraries(drive_straight ${catkin_LIBRARIES})
 add_dependencies(drive_straight ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
@@ -89,3 +93,7 @@ add_dependencies(u_turn ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TA
 add_executable(exit_enter_turn src/exp_exit_enter_turn.cpp)
 target_link_libraries(exit_enter_turn ${catkin_LIBRARIES})
 add_dependencies(exit_enter_turn ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+# add_executable(subscribers include/simulation_code/functions/subscribers.cpp)
+# target_link_libraries(subscribers ${catkin_LIBRARIES} -nostartfiles) 
+# add_dependencies(subscribers ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})

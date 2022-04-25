@@ -1,49 +1,62 @@
+#ifndef SUBSCRIBE_H_
+#define SUBSCRIBE_H_
+
 #include <ros/ros.h>
 #include <math.h>
 
+#include <string>
+#include <std_msgs/String.h>
 #include <sensor_msgs/LaserScan.h>
 #include <geometry_msgs/Twist.h>
 #include <nav_msgs/Odometry.h>
-#include <simulation_code/Localization.h>
+#include <std_msgs/Bool.h>
 
 #include "geometry_msgs/Pose.h"
-#include <geometry_msgs/PoseStamped.h>
+#include "geometry_msgs/PoseStamped.h"
 #include "geometry_msgs/PoseWithCovarianceStamped.h"
+#include <simulation_code/Localization.h>
 
 #include <move_base_msgs/MoveBaseAction.h>
 #include <actionlib/client/simple_action_client.h>
 
+#include <fstream>
+
+
+
 #define DEG2RAD (M_PI / 180.0)
 #define RAD2DEG (180.0 / M_PI)
 
-#define lin_vel   0.3
+#define lin_vel   0.5
 #define ang_vel   1.5
 
-#define dist_rows_y   0.4
-#define dist_rows_x   0.3
+#define dist_rows_y   1.5
+#define dist_rows_x   4
 
 #define forward   0 
 #define left      1
 #define backward  2
 #define right     3
 
-#define get_placement 0 
-#define concrete_cross  1 
-#define concrete_turn   2
-#define rail_f        3
-#define rail_b        4
-#define rail_end_f    5
-#define rail_end_b    6
 
 
-class Localization
+class Subscribers
 {
  public:
-  Localization();
-  ~Localization();
+  Subscribers();
+  ~Subscribers();
   bool init();
   bool controlLoop();
   bool simulationLoop();
+
+  // Functions
+  void laserScanMsgCallBack(const sensor_msgs::LaserScan::ConstPtr &msg);
+  void odomMsgCallBack(const nav_msgs::Odometry::ConstPtr &msg);
+  void poseMsgCallBack(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr &msg);
+  void localizationCallBack(const simulation_code::LocalizationConstPtr &msg);
+  void environmentCallBack(const std_msgs::StringConstPtr &msg);
+  void obstacleCallBack(const std_msgs::Bool::ConstPtr &msg);
+
+
 
  private:
   // ROS NodeHandle
@@ -56,16 +69,14 @@ class Localization
   ros::Time begin;
 
   // ROS Topic Publishers
-  ros::Publisher cmd_vel_pub_;
-  ros::Publisher goal_pub_;
-  ros::Publisher init_pose_pub_;
-  ros::Publisher localization_pub_;
 
   // ROS Topic Subscribers
   ros::Subscriber laser_scan_sub_;
   ros::Subscriber odom_sub_;
   ros::Subscriber pose_sub_;
-  ros::Subscriber move_base_status_sub_;
+  ros::Subscriber localization_sub_;
+  ros::Subscriber environment_sub_;
+  ros::Subscriber obstacle_sub_;
 
   // ROS Action Clients
   typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> status_client_;
@@ -82,24 +93,15 @@ class Localization
   double pose_odom_rot;
   double pose_odom_pos_x;
   double pose_odom_pos_y;
+  double twist_odom_lin;
+  double twist_odom_ang;
   double pose_goal_rot;
   double pose_goal_x;
   double pose_goal_y;
-
-  bool drive_f = true;
-  bool drive_b = false;
-  bool first = true;
-  int turns;
-  int round = 1;
-
-  // Functions
-  // void updateCommandVelocity(double linear, double angular);
-//   void updateIntialPose(double pos_x, double pos_y, double rot_z);
-//   void updateNavigationGoal(double pos_x, double pos_y, double rot_z);
-  void updateLocalization(double row_, const char* section_);
-  
-  // void laserScanMsgCallBack(const sensor_msgs::LaserScan::ConstPtr &msg);
-  void odomMsgCallBack(const nav_msgs::Odometry::ConstPtr &msg);
-  void poseMsgCallBack(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr &msg);
+  double row_;
+  std::string section_;
+  std::string env_;
+  bool obst_;
 
 };
+#endif // SUBSCRIBE_H_

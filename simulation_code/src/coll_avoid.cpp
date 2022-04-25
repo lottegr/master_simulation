@@ -139,34 +139,17 @@ void CollisionAvoid::updateObstacleBool(bool obst)
 
 bool CollisionAvoid::simulationLoop()
 {
-  // begin = ros::Time::now();
 
   if ((scan_data_[0] < 0.4 && cmd_lin_ >= 0) || (scan_data_[2] < 0.4 && cmd_lin_ <= 0)) 
-  // if ((scan_data_[0] < 0.5) || (scan_data_[2] < 0.5)) 
   {
-
+  
     if (env_ != "end_f" && env_ != "end_b")
     {
       updateObstacleBool(true);
-      
-      // updateCommandVelocity(0,0);
-      if (!stopped)
-      {
-        double temp_lin = cmd_lin_;
-        double temp_ang = cmd_ang_;
-        updateCommandVelocity(0,0);
-        ROS_WARN("Obstacle in path, waiting for 3 seconds.");
-        // ROS_INFO_STREAM("Press c to continue.");
-        ros::Duration(3).sleep();
-        stopped = true;
-      } 
-      else
-      {
-        updateCommandVelocity(0,0);
-        ROS_WARN("Obstacle in path, waiting for 3 seconds.");
-        // ROS_INFO_STREAM("Press c to continue.");
-        ros::Duration(3).sleep();
-      } 
+
+      ROS_WARN("Obstacle in path, waiting for 3 seconds.");
+      // ROS_INFO_STREAM("Press c to continue.");
+      ros::Duration(3).sleep();
 
       // std::string c;
       // std::cin >> c;
@@ -180,17 +163,11 @@ bool CollisionAvoid::simulationLoop()
   else
   {
     updateObstacleBool(false);
-    // updateCommandVelocity(temp_lin,temp_ang);
-    // double temp_lin = cmd_lin_;
-    // double temp_ang = cmd_ang_;
     
     stopped = false;
 
-    // ROS_INFO_STREAM(temp_lin << "    " << cmd_lin_);
-
   } 
 
-  // ROS_INFO_STREAM(temp_lin << "     " << cmd_lin_);
 
   return true;
 }

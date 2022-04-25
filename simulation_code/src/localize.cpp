@@ -1,3 +1,7 @@
+#include "simulation_code/functions/publishers.h"
+#include "simulation_code/functions/publishers.cpp"
+#include "simulation_code/functions/subscribers.h"
+#include "simulation_code/functions/subscribers.cpp"
 #include "simulation_code/rows_and_sections.h"
 #include "simulation_code/localize.h"
 
@@ -23,11 +27,12 @@ Localization::~Localization()
 bool Localization::init()
 {
   // initialize publishers
-  localization_pub_ = nh_.advertise<simulation_code::Localization>("/localization", 10);
+  loc_pub_ = nh_.advertise<simulation_code::Localization>("/localization", 10);
 
+  // Subscribers subbers;
   // initialize subscribers
   odom_sub_ = nh_.subscribe("odom", 10, &Localization::odomMsgCallBack, this);
-  pose_sub_ = nh_.subscribe("/amcl_pose", 10, &Localization::poseMsgCallBack, this);
+  // pose_sub_ = nh_.subscribe("/amcl_pose", 10, &Subscribers::poseMsgCallBack, this);
     
   return true;
 }
@@ -47,29 +52,29 @@ void Localization::odomMsgCallBack(const nav_msgs::Odometry::ConstPtr &msg)
 }
 
 
-void Localization::poseMsgCallBack(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr &msg)
-{
-  double siny = 2.0 * (msg->pose.pose.orientation.w * msg->pose.pose.orientation.z + msg->pose.pose.orientation.x * msg->pose.pose.orientation.y);
-	double cosy = 1.0 - 2.0 * (msg->pose.pose.orientation.y * msg->pose.pose.orientation.y + msg->pose.pose.orientation.z * msg->pose.pose.orientation.z);  
+// void Localization::poseMsgCallBack(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr &msg)
+// {
+//   double siny = 2.0 * (msg->pose.pose.orientation.w * msg->pose.pose.orientation.z + msg->pose.pose.orientation.x * msg->pose.pose.orientation.y);
+// 	double cosy = 1.0 - 2.0 * (msg->pose.pose.orientation.y * msg->pose.pose.orientation.y + msg->pose.pose.orientation.z * msg->pose.pose.orientation.z);  
 
-	pose_rot = atan2(siny, cosy) * RAD2DEG;
-  pose_pos_x = msg->pose.pose.position.x;
-  pose_pos_y = msg->pose.pose.position.y;
-}
+// 	pose_rot = atan2(siny, cosy) * RAD2DEG;
+//   pose_pos_x = msg->pose.pose.position.x;
+//   pose_pos_y = msg->pose.pose.position.y;
+// }
 
 
 
 // publishers
 
-void Localization::updateLocalization(double row_, const char* section_)
-{
-  simulation_code::Localization loc;
+// void Localization::updateLocalization(double row_, const char* section_)
+// {
+//   simulation_code::Localization loc;
 
-  loc.row = row_;
-  loc.section = section_;
+//   loc.row = row_;
+//   loc.section = section_;
 
-  localization_pub_.publish(loc);
-}
+//   localization_pub_.publish(loc);
+// }
 
 
 
@@ -97,22 +102,18 @@ bool Localization::simulationLoop()
         if (abs(pose_odom_pos_y) < error_)
         {
           find_row = 1;
-          // ROS_INFO_STREAM("row1");
         }
         else if (abs(pose_odom_pos_y - row2) < error_)
         {
           find_row = 2;
-          // ROS_INFO_STREAM("row2");
         }
         else if (abs(pose_odom_pos_y - row3) < error_)
         {
           find_row = 3;
-          // ROS_INFO_STREAM("row3");
         }
         else if (abs(pose_odom_pos_y - row4) < error_)
         {
           find_row = 4;
-          // ROS_INFO_STREAM("row4");
         }
         break;
 
@@ -144,32 +145,26 @@ bool Localization::simulationLoop()
         if (pose_odom_pos_x < secA)
         {
           find_section = 1;
-          // ROS_INFO_STREAM("secA");
         }
         else if (pose_odom_pos_x < secB && pose_odom_pos_x > secA)
         {
           find_section = 2;
-          // ROS_INFO_STREAM("secB");
         }
         else if (pose_odom_pos_x < secC && pose_odom_pos_x > secB)
         {
           find_section = 3;
-          // ROS_INFO_STREAM("secC");
         }
         else if (pose_odom_pos_x > secD && pose_odom_pos_x < secE)
         {
           find_section = 4;
-          // ROS_INFO_STREAM("secD");
         }
         else if (pose_odom_pos_x > secE && pose_odom_pos_x < secF)
         {
           find_section = 5;
-          // ROS_INFO_STREAM("secE");
         }
         else if (pose_odom_pos_x > secF)
         {
           find_section = 6;
-          // ROS_INFO_STREAM("secF");
         }
         else
         {
@@ -213,7 +208,9 @@ bool Localization::simulationLoop()
         break;
     }
 
-    updateLocalization(row_, section_);
+    Publishers pubbers;
+    pubbers.updateLocalization(row_, section_);
+
 
   return true;
 }

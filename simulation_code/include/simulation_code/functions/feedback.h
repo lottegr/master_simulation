@@ -15,9 +15,8 @@
 *******************************************************************************/
 
 /* Authors: Taehun Lim (Darby) */
-
-#ifndef SIMUDRIVE_H_
-#define SIMUDRIVE_H_
+#ifndef func_H
+#define func_H
 
 #include <ros/ros.h>
 #include <math.h>
@@ -65,13 +64,11 @@
 
 
 
-
-
-class SimulationDrive
+class FeedbackFunctions
 {
  public:
-  SimulationDrive();
-  ~SimulationDrive();
+  FeedbackFunctions();
+  ~FeedbackFunctions();
   bool init();
   bool controlLoop();
   bool simulationLoop();
@@ -93,19 +90,10 @@ class SimulationDrive
 
   // ROS Topic Publishers
   ros::Publisher cmd_vel_pub_;
-  ros::Publisher goal_pub_;
-  ros::Publisher init_pose_pub_;
-  ros::Publisher env_pub_;
 
   // ROS Topic Subscribers
-  ros::Subscriber laser_scan_sub_;
   ros::Subscriber odom_sub_;
-
-  ros::Subscriber pose_sub_;
-  ros::Subscriber move_base_status_sub_;
-  ros::Subscriber localization_sub_;
-  ros::Subscriber environment_sub_;
-  ros::Subscriber obstacle_sub_;
+  // ros::Subscriber pose_sub_;
 
   // ROS Action Clients
   typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> status_client_;
@@ -114,11 +102,6 @@ class SimulationDrive
   double forward_dist_;
   double side_dist_;
 
-  double scan_data_[4] = {10,10,10,10};
-
-  double init_x;
-  double init_y;
-  double init_z;
   double pose_rot;
   double pose_pos_x;
   double pose_pos_y;
@@ -127,65 +110,13 @@ class SimulationDrive
   double pose_odom_pos_y;
   double twist_odom_lin;
   double twist_odom_ang;
-  double pose_goal_rot;
-  double pose_goal_x;
-  double pose_goal_y;
-  double row_;
-  std::string section_;
-  std::string env_;
-  bool obst_;
-
-  bool drive_f = true;
-  bool drive_b = false;
-  bool first = true;
-  int turns;
-  int round = 1;
-  int turn_step = 1;
-  int i = 0;
 
   // Functions
   void updateCommandVelocity(double linear, double angular);
-  void updateInitialPose(double pos_x, double pos_y, double rot_z);
-  void updateNavigationGoal(double pos_x, double pos_y, double rot_z);
-  void updateEnvironment(std::string environment);
-  
-  void laserScanMsgCallBack(const sensor_msgs::LaserScan::ConstPtr &msg);
   void odomMsgCallBack(const nav_msgs::Odometry::ConstPtr &msg);
-  void poseMsgCallBack(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr &msg);
-  void localizationCallBack(const simulation_code::LocalizationConstPtr &msg);
-  void environmentCallBack(const std_msgs::StringConstPtr &msg);
-  void obstacleCallBack(const std_msgs::Bool::ConstPtr &msg);
+  // void poseMsgCallBack(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr &msg);
 
-  void makeUturn(int round);
-
-  // std::ofstream outFile;
-  std::vector<double> y1;
-  std::vector<double> y2;
-  std::vector<double> y3;
-  std::vector<double> y4;
-  std::vector<double> y5;
-  std::vector<double> l1;
-  std::vector<double> l3;
-  std::vector<double> l5;
-
-  std::vector<double> y1u;
-  std::vector<double> y2u;
-  std::vector<double> y3u;
-  std::vector<double> y4u;
-  std::vector<double> y5u;
-  std::vector<double> l1u;
-  std::vector<double> l3u;
-  std::vector<double> l5u;
-
-  std::vector<double> px;
-  std::vector<double> py;
-  std::vector<double> pa;
-
-
-  std::vector<double> twist;
-
-
-  double output_ang_prev = 0;
 
 };
-#endif // SIMUDRIVE_H_
+
+#endif

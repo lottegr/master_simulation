@@ -1,3 +1,5 @@
+#include "simulation_code/functions/feedback.h"
+#include "simulation_code/functions/feedback.cpp"
 #include "simulation_code/simudrive.h"
 #include "simulation_code/exp_rows_and_sections.h"
 #include "pid/pid.h"
@@ -44,16 +46,6 @@ bool SimulationDrive::init()
   localization_sub_ = nh_.subscribe("localization", 10, &SimulationDrive::localizationCallBack, this);
   environment_sub_ = nh_.subscribe("environment", 10, &SimulationDrive::environmentCallBack, this);
   obstacle_sub_ = nh_.subscribe("obstacle", 10, &SimulationDrive::obstacleCallBack, this);
-
-  // ROS_INFO_STREAM("x: ");
-  // std::cin >> init_x;
-  // ROS_INFO_STREAM("y: "); 
-  // std::cin >> init_y;
-  // ROS_INFO_STREAM("z: ");
-  // std::cin >> init_z;
-
-  // updateInitialPose(init_x, init_y, init_z);
-
 
   return true;
 }
@@ -183,66 +175,6 @@ void SimulationDrive::updateEnvironment(std::string environment)
 
 
 
-double SimulationDrive::rotate(double sensor, double target, bool over180)
-{
-  PID pid_ang = PID(0.1,ang_vel,-ang_vel, 0.01, 0.005, 0.05);
-
-  if (over180){
-    if (pose_odom_rot > 0){
-      sensor = sensor;
-    } else {
-      sensor = 360 + sensor;
-    }
-  }
-
-  double output_ang = pid_ang.calculate(target, sensor);
-  updateCommandVelocity(0, output_ang); 
-
-  return output_ang;
-}
-
-
-double SimulationDrive::driveStraight(int dir, double sensor_lin, double target_lin, double sensor_ang, double target_ang, bool target_pos=true, int direction=1)
-{
-  if (target_pos)
-  {
-    PID pid_lin = PID(0.1,lin_vel,-lin_vel, 1, 0.05, 0.5);
-    PID pid_ang = PID(0.1,ang_vel,-ang_vel, 1, 0.05, 0);         // droppe D-term ??
-    
-    double output_lin = pid_lin.calculate(target_lin,sensor_lin);
-    double output_ang = pid_ang.calculate(target_ang,sensor_ang);
-    if (dir == 1){
-      updateCommandVelocity(output_lin, output_ang); 
-    } else if (dir == 0) {
-      updateCommandVelocity(-output_lin, -output_ang); 
-    } else if (dir == 2) {
-      updateCommandVelocity(output_lin, -output_ang);
-    }
-
-    return output_lin, output_ang;
-  }
-
-  else
-  {
-    PID pid = PID(0.1,ang_vel,-ang_vel, 1, 0.05, 0);
-    double output = pid.calculate(target_ang,sensor_ang);
-
-    if (dir == 1)
-    {
-      updateCommandVelocity(direction*lin_vel, direction*output);
-    }
-    else 
-    {
-      updateCommandVelocity(direction*lin_vel, -direction*output);
-    }
-  }
-
-}
-
-
-
-
-
 
 
 
@@ -279,8 +211,10 @@ void SimulationDrive::write_to_file(std::vector<double> v, std::string name)
 
 bool SimulationDrive::simulationLoop()
 {
-    
-    // double initial_y = 2;
+  FeedbackFunctions feedback;
+  
+  if (!obst_)
+  {
     std::vector<double> sensor_goal = {pose_odom_pos_x,
                                         pose_odom_rot,
                                         pose_odom_pos_y,
@@ -306,36 +240,36 @@ bool SimulationDrive::simulationLoop()
     
     if (i%2 == 0)   // drive straight
     {
-        if ( abs(sensor_goal[i] - target_goal[i]) > 0.05 )
-        {
-            driveStraight(dirs[i],sensor_goal[i],target_goal[i],sensor_line[i],target_line[i]);
-        }
-        else
-        {
-            updateCommandVelocity(0,0);
-            ros::Duration(2).sleep();
-            i += 1;
-        }
+      if ( abs(sensor_goal[i] - target_goal[i]) > 0.05 )
+      {
+          feedback.driveStraight(dirs[i],sensor_goal[i],target_goal[i],sensor_line[i],target_line[i]);
+      }
+      else
+      {
+          updateCommandVelocity(0,0);
+          ros::Duration(2).sleep();
+          i += 1;
+      }
     }       
     else            // rotate
     {
-        if ( abs(sensor_goal[i] - target_goal[i]) > 0.1 )
-        {
-            if (i != 3)
-            {
-                rotate(sensor_goal[i],target_goal[i],false);
-            }
-            else
-            {
-                rotate(sensor_goal[i],target_goal[i],true);
-            }
-        }
-        else
-        {
-            updateCommandVelocity(0,0);
-            ros::Duration(2).sleep();
-            i += 1;
-        }
+      if ( abs(sensor_goal[i] - target_goal[i]) > 0.1 )
+      {
+          if (i != 3)
+          {
+              feedback.rotate(sensor_goal[i],target_goal[i],false);
+          }
+          else
+          {
+              feedback.rotate(sensor_goal[i],target_goal[i],true);
+          }
+      }
+      else
+      {
+          updateCommandVelocity(0,0);
+          ros::Duration(2).sleep();
+          i += 1;
+      }
     }
   
     
@@ -345,8 +279,12 @@ bool SimulationDrive::simulationLoop()
     // driveStraight(round%2,0,0,pose_odom_pos_y,(round-1)*dist_rows_y,false,1);
 
     // rotate(pose_odom_rot,90,false);
-
-    return true;
+  }
+  else
+  {
+    updateCommandVelocity(0,0);
+  }
+  return true;
 }
 
 

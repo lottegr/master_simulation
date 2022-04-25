@@ -1,12 +1,13 @@
+#include "simulation_code/functions/feedback.h"
+#include "simulation_code/functions/feedback.cpp"
 #include "simulation_code/simudrive.h"
 #include "MiniPID/MiniPID.h"
-#include "MiniPID/MiniPID.cpp"
+// #include "MiniPID/MiniPID.cpp"
 #include "pid/pid.h"
 #include "pid/pid.cpp"
 #include <vector>
 #include <fstream>
 #include <iostream>
-// #include "matplotlib-cpp/matplotlibcpp.h"
 
 SimulationDrive::SimulationDrive()
   : nh_priv_("~")
@@ -185,68 +186,6 @@ void SimulationDrive::updateEnvironment(std::string environment)
 
 
 
-double SimulationDrive::driveStraight(int dir, double sensor_lin, double target_lin, double sensor_ang, double target_ang, bool target_pos=true, int direction=1)
-{
-  double dt = 0.1;
-  
-  if (target_pos)
-  {
-    
-
-    PID pid_lin = PID(dt,lin_vel,-lin_vel, 1, 0,0);
-    PID pid_ang = PID(dt,ang_vel,-ang_vel, 1, 0.05, 1);         // droppe D-term ??
-    
-    double output_lin = pid_lin.calculate(target_lin,sensor_lin);
-    double output_ang_ = pid_ang.calculate(target_ang,sensor_ang);
-
-    
-    double output_ang__ = ( output_ang_ - output_ang_prev ) / dt;
-    double output_ang = asin(output_ang__/output_lin);
-
-    ROS_INFO_STREAM(sensor_ang << "  " << output_ang_);
-
-    if (dir == 1){
-      updateCommandVelocity(output_lin, output_ang); 
-    } else if (dir == 0) {
-      updateCommandVelocity(-output_lin, -output_ang); 
-    } else if (dir == 2) {
-      updateCommandVelocity(output_lin, -output_ang);
-    }
-
-    output_ang_prev = output_ang;
-
-    return output_lin, output_ang;
-  }
-
-  else
-  {
-    PID pid = PID(0.1,ang_vel,-ang_vel, 1, 0.05, 0);
-    double output = pid.calculate(target_ang,sensor_ang);
-
-    if (dir == 1)
-    {
-      updateCommandVelocity(direction*lin_vel, direction*output);
-    }
-    else 
-    {
-      updateCommandVelocity(direction*lin_vel, -direction*output);
-    }
-
-    
-  }
-
-  
-}
-
-
-
-
-
-
-
-
-
-
 void SimulationDrive::write_to_file(std::vector<double> v, std::string name)
 {
 
@@ -278,17 +217,25 @@ void SimulationDrive::write_to_file(std::vector<double> v, std::string name)
 
 bool SimulationDrive::simulationLoop()
 {
-  // forward
-  driveStraight(1,0,0,pose_odom_pos_y,0,false,1);
+  if (!obst_)
+  {
+    // forward
+    FeedbackFunctions feedback;
+    feedback.driveStraight(1,0,0,pose_odom_pos_y,0,false,1);
 
-  // backward
-  // driveStraight(0,0,0,pose_odom_pos_y,0,false,-1);
+    // backward
+    // driveStraight(0,0,0,pose_odom_pos_y,0,false,-1);
 
 
 
-  // to goal
-  // driveStraight(1,pose_odom_pos_x,2,pose_odom_pos_y,0);
+    // to goal
+    // driveStraight(1,pose_odom_pos_x,2,pose_odom_pos_y,0);
 
+  }
+  else
+  {
+    updateCommandVelocity(0,0);
+  }
   return true;
 }
 

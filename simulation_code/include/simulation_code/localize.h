@@ -1,6 +1,5 @@
 #include <ros/ros.h>
 #include <math.h>
-
 #include <nav_msgs/Odometry.h>
 #include <simulation_code/Localization.h>
 #include "geometry_msgs/PoseWithCovarianceStamped.h"
@@ -29,7 +28,7 @@ class Localization
   ros::Time begin;
 
   // ROS Topic Publishers
-  ros::Publisher localization_pub_;
+  ros::Publisher loc_pub_;
 
   // ROS Topic Subscribers
   ros::Subscriber odom_sub_;
@@ -44,8 +43,8 @@ class Localization
   double pose_odom_pos_y;
   
   // Functions
-  void updateLocalization(double row_, const char* section_);
+  // void updateLocalization(double row_, const char* section_);
   void odomMsgCallBack(const nav_msgs::Odometry::ConstPtr &msg);
-  void poseMsgCallBack(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr &msg);
+  // void poseMsgCallBack(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr &msg);
 
 };
