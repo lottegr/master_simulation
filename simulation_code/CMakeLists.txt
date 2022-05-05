@@ -21,6 +21,7 @@ find_package(gazebo REQUIRED)
 add_message_files(
   FILES
   Localization.msg
+  EncoderData.msg
 )
 
 generate_messages(
@@ -77,6 +78,10 @@ add_dependencies(environment ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORT
 add_executable(sensors src/sensors.cpp)
 target_link_libraries(sensors ${catkin_LIBRARIES})
 add_dependencies(sensors ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+add_executable(odom_from_encoder src/odom_from_encoder.cpp)
+target_link_libraries(odom_from_encoder ${catkin_LIBRARIES})
+add_dependencies(odom_from_encoder ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 add_executable(odom_switch src/odom_switch.cpp)
 target_link_libraries(odom_switch ${catkin_LIBRARIES})

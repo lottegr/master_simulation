@@ -1,0 +1,42 @@
+ros2 run ros1_bridge dynamic_bridge --bridge-all-2to1-topics --bridge-all-1to2-topics
+el.  bridge-all-topics     lol
+
+printenv | grep ros
+
+rosrun rqt_tf_tree rqt_tf_tree
+
+rosrun map_server map_saver -f ~/catkin_ws/src/master_simulation/robot_navigation_params/map/---NAME---
+
+
+
+
+------
+
+made a new publishing subscriber to split up the custom msg to std_msg/int64 in ros2 environment 
+	remember to run "ros2 run cpp_pubsub pubsub" to get split msg
+	
+	
+	
+	
+bruksanvisning:     (as of 03.05)
+
+source ros-versions:
+	ROS1 - source /opt/ros/noetic/setup.bash
+	ROS2 - source ~/ros2_galactic/install/setup.bash
+
+- roscore (.ros1)
+	
+- rosbridge (.ros1 .ros2)
+	ros2 run ros1_bridge dynamic_bridge bridge-all-topics	
+	
+- lidar: 
+	roslaunch ydlidar TG.launch
+- odom: 
+	ros2 run cpp_pubsub pubsub
+	rosrun simulation_code odom_from_encoder
+	
+- rviz with map:
+	****** make launch file?
+	
+
+

@@ -140,7 +140,7 @@ void CollisionAvoid::updateObstacleBool(bool obst)
 bool CollisionAvoid::simulationLoop()
 {
 
-  if ((scan_data_[0] < 0.4 && cmd_lin_ >= 0) || (scan_data_[2] < 0.4 && cmd_lin_ <= 0)) 
+  if ((scan_data_[0] < 0.5 && cmd_lin_ >= 0) || (scan_data_[2] < 1 && cmd_lin_ <= 0)) 
   {
   
     if (env_ != "end_f" && env_ != "end_b")
