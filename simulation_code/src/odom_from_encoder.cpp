@@ -49,9 +49,9 @@ const double PI = 3.141592;
  
 // Robot physical constants
 const double TICKS_PER_REVOLUTION = 5720.82; // For reference purposes.
-const double WHEEL_RADIUS = 0.258; // Wheel radius in meters
-const double WHEEL_BASE = 0.6823; // Center of left tire to center of right tire
-const double TICKS_PER_METER = 3529.06;
+const double WHEEL_RADIUS = 0.256; // Wheel radius in meters
+const double WHEEL_BASE = 0.717; // Center of left tire to center of right tire
+const double TICKS_PER_METER = 3666;
 
 // const double WHEEL_RADIUS = 0.185; // Wheel radius in meters
 // const double WHEEL_BASE = 0.555; // Center of left tire to center of right tire
@@ -84,7 +84,7 @@ void Calc_Left(const std_msgs::Int64& leftCount) {
   if(leftCount.data != 0 && lastCountL != 0) {
          
     int leftTicks = (leftCount.data - lastCountL);
- 
+    
     if (leftTicks > 10000) {
       leftTicks = 0 - (65535 - leftTicks);
     }
@@ -115,7 +115,6 @@ void Calc_Right(const std_msgs::Int64& rightCount) {
     distanceRight = rightTicks/TICKS_PER_METER;
   }
   lastCountR = rightCount.data;
-
 }
  
 
@@ -283,7 +282,7 @@ int main(int argc, char **argv) {
 
 
  
-  ros::Rate loop_rate(30); 
+  ros::Rate loop_rate(20); 
      
   while(ros::ok()) {
      

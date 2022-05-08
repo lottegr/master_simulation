@@ -7,6 +7,15 @@ rosrun rqt_tf_tree rqt_tf_tree
 
 rosrun map_server map_saver -f ~/catkin_ws/src/master_simulation/robot_navigation_params/map/---NAME---
 
+ghp_BWwu2Ejri7Saj1M36CLT6YiZpEF4P2Klgbd
+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
+
+
+rostopic pub /initialpose geometry_msgs/PoseWithCovarianceStamped '{header: {stamp: now, frame_id: "map"}, pose: {pose: {position: {x: 0.0, y: 0.0, z: 0.0}, orientation: {z: 0.707, w: 0.707}}}}'
+
+. /opt/ros/noetic/setup.bash
+. catkin_ws/devel/setup.bash
+
 
 
 

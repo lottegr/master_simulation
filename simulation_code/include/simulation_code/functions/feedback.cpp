@@ -117,7 +117,8 @@ double FeedbackFunctions::driveStraight(int dir, double sensor_lin, double targe
     PID pid_ang = PID(0.1,ang_vel,-ang_vel, 1, 0.05, 0);         // droppe D-term ??
     
     double output_lin = pid_lin.calculate(target_lin,sensor_lin);
-    double output_ang = pid_ang.calculate(target_ang,sensor_ang);
+    // double output_ang = pid_ang.calculate(target_ang,sensor_ang);
+    double output_ang = 0;
     if (dir == 1){
       updateCommandVelocity(output_lin, output_ang); 
     } else if (dir == 0) {

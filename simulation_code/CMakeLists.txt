@@ -99,6 +99,10 @@ add_executable(exit_enter_turn src/exp_exit_enter_turn.cpp)
 target_link_libraries(exit_enter_turn ${catkin_LIBRARIES})
 add_dependencies(exit_enter_turn ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
+add_executable(exp_test src/exp_test.cpp)
+target_link_libraries(exp_test ${catkin_LIBRARIES})
+add_dependencies(exp_test ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
 # add_executable(subscribers include/simulation_code/functions/subscribers.cpp)
 # target_link_libraries(subscribers ${catkin_LIBRARIES} -nostartfiles) 
 # add_dependencies(subscribers ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
