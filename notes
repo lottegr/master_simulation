@@ -11,6 +11,9 @@ rosrun map_server map_saver -f ~/catkin_ws/src/master_simulation/robot_navigatio
 
 rostopic pub /initialpose geometry_msgs/PoseWithCovarianceStamped '{header: {stamp: now, frame_id: "map"}, pose: {pose: {position: {x: 0.0, y: 0.0, z: 0.0}, orientation: {z: 0.707, w: 0.707}}}}'
 
+PID:
+rostopic pub /initialpose geometry_msgs/PoseWithCovarianceStamped '{header: {stamp: now, frame_id: "map"}, pose: {pose: {position: {x: 0.05, y: 2.0, z: 0.0}, orientation: {w: 1}}}}'
+
 . /opt/ros/noetic/setup.bash
 . catkin_ws/devel/setup.bash
 
@@ -46,4 +49,8 @@ source ros-versions:
 	****** make launch file?
 	
 
+
+
+Videre arbeid:
+- sjekke rails før entering -> logge manglene rails -> kunne kjøre tilbake til manglende rails (feks her hadde jeg trengt den generateGoal(points) )
 

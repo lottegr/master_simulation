@@ -1,13 +1,13 @@
 #include "simulation_code/functions/feedback.h"
 #include "simulation_code/functions/feedback.cpp"
 #include "simulation_code/simudrive.h"
-#include "MiniPID/MiniPID.h"
-// #include "MiniPID/MiniPID.cpp"
+#include "simulation_code/exp_rows_and_sections.h"
 #include "pid/pid.h"
 #include "pid/pid.cpp"
 #include <vector>
 #include <fstream>
 #include <iostream>
+// #include "matplotlib-cpp/matplotlibcpp.h"
 
 SimulationDrive::SimulationDrive()
   : nh_priv_("~")
@@ -38,30 +38,14 @@ bool SimulationDrive::init()
   cmd_vel_pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 10);
   init_pose_pub_ = nh_.advertise<geometry_msgs::PoseWithCovarianceStamped>("initialpose", 10);
   // env_pub_ = nh_.advertise<std_msgs::String>("environment", 10);
-  steer_pub_ = nh_.advertise<std_msgs::Float64>("steer", 10);
-
 
   // initialize subscribers
   // laser_scan_sub_  = nh_.subscribe("scan", 10, &SimulationDrive::laserScanMsgCallBack, this);
-  odom_sub_ = nh_.subscribe("odometry/filtered_map", 10, &SimulationDrive::odomMsgCallBack, this);
-  // odom_sub_ = nh_.subscribe("odom", 10, &SimulationDrive::odomMsgCallBack, this);
-  
-  
+  odom_sub_ = nh_.subscribe("odom", 10, &SimulationDrive::odomMsgCallBack, this);
   // pose_sub_ = nh_.subscribe("amcl_pose", 10, &SimulationDrive::poseMsgCallBack, this);
   localization_sub_ = nh_.subscribe("localization", 10, &SimulationDrive::localizationCallBack, this);
   environment_sub_ = nh_.subscribe("environment", 10, &SimulationDrive::environmentCallBack, this);
   obstacle_sub_ = nh_.subscribe("obstacle", 10, &SimulationDrive::obstacleCallBack, this);
-  cmd_vel_sub_ = nh_.subscribe("cmd_vel", 10, &SimulationDrive::commandVelocityCallBack, this);
-
-
-  // ROS_INFO_STREAM("x: ");
-  // std::cin >> init_x;
-  // ROS_INFO_STREAM("y: "); 
-  // std::cin >> init_y;
-  // ROS_INFO_STREAM("z: ");
-  // std::cin >> init_z;
-
-  // updateInitialPose(init_x, init_y, init_z);
 
   return true;
 }
@@ -74,9 +58,9 @@ void SimulationDrive::odomMsgCallBack(const nav_msgs::Odometry::ConstPtr &msg)
 {
   // pose
   double siny = 2.0 * (msg->pose.pose.orientation.w * msg->pose.pose.orientation.z + msg->pose.pose.orientation.x * msg->pose.pose.orientation.y);
-	double cosy = 1.0 - 2.0 * (msg->pose.pose.orientation.y * msg->pose.pose.orientation.y + msg->pose.pose.orientation.z * msg->pose.pose.orientation.z);  
+  double cosy = 1.0 - 2.0 * (msg->pose.pose.orientation.y * msg->pose.pose.orientation.y + msg->pose.pose.orientation.z * msg->pose.pose.orientation.z);  
 
-	pose_odom_rot = atan2(siny, cosy) * RAD2DEG;
+  pose_odom_rot = atan2(siny, cosy) * RAD2DEG;
   pose_odom_pos_x = msg->pose.pose.position.x;
   pose_odom_pos_y = msg->pose.pose.position.y;
 
@@ -126,12 +110,6 @@ void SimulationDrive::environmentCallBack(const std_msgs::String::ConstPtr &msg)
 void SimulationDrive::obstacleCallBack(const std_msgs::Bool::ConstPtr &msg)
 {
   obst_ = msg->data;
-}
-
-void SimulationDrive::commandVelocityCallBack(const geometry_msgs::Twist::ConstPtr &msg)
-{
-  cmd_lin_ = msg->linear.x;
-  cmd_ang_ = msg->angular.z;
 }
 
 
@@ -195,14 +173,8 @@ void SimulationDrive::updateEnvironment(std::string environment)
   env_pub_.publish(env);
 }
 
-void SimulationDrive::updateSteerAngle(double angle)
-{
-  std_msgs::Float64 ang;
 
-  ang.data = angle;
 
-  steer_pub_.publish(ang);
-}
 
 
 
@@ -239,59 +211,58 @@ void SimulationDrive::write_to_file(std::vector<double> v, std::string name)
 
 bool SimulationDrive::simulationLoop()
 {
+  FeedbackFunctions feedback;
+  
   if (!obst_)
   {
-
-    FeedbackFunctions feedback;
-
-    std::vector<double> sensor_goal = {pose_odom_pos_y,
+    std::vector<double> sensor_goal = {pose_odom_pos_x,
                                         pose_odom_rot,
-                                        pose_odom_pos_x,
+                                        pose_odom_pos_y,
                                         pose_odom_rot,
                                         pose_odom_pos_x};
-    // std::vector<double> sensor_line = {pose_odom_pos_y,0,
-    //                                     pose_odom_pos_x,0,
-    //                                     pose_odom_pos_y};
-    std::vector<double> target_goal = {2.6, 
-                                        0, 
-                                        0, 
-                                       -90, 
-                                       0};
-    // std::vector<double> target_line = {0, 0, 
-    //                                    move_x_1, 0, 
-    //                                    row2};
-    std::vector<double> dirs = {2, 0,
-                                1, 0,
-                                3};
+    std::vector<double> sensor_line = {pose_odom_pos_y,0,
+                                        pose_odom_pos_x,0,
+                                        pose_odom_pos_y};
+    std::vector<double> target_goal = {move_x_1, 
+                                        90, 
+                                        row2, 
+                                        180, 
+                                        0};
+    std::vector<double> target_line = {0, 0, 
+                                        move_x_1, 0, 
+                                        row2};
+    std::vector<double> dirs = {1, 0,
+                                2, 0,
+                                0};
 
-    ROS_INFO_STREAM("Step: " << i << ", goal: " << target_goal[i] << ", measurement: " << sensor_goal[i]);
-
+   
+    ROS_INFO_STREAM(i);
+    
     if (i%2 == 0)   // drive straight
     {
-      if (i==4)
+      if ( abs(sensor_goal[i] - target_goal[i]) > 0.05 )
       {
-        double out = feedback.driveStraight(1,0,0,sensor_goal[i],target_goal[i],false,1);
+          feedback.driveStraight(dirs[i],sensor_goal[i],target_goal[i],sensor_line[i],target_line[i]);
       }
-      else 
+      else
       {
-        if ( abs(sensor_goal[i] - target_goal[i]) > 0.05 || cmd_lin_ > 0.005 )
-        {
-          feedback.driveStraight(dirs[i],sensor_goal[i],target_goal[i],0,0);
-        }
-        else
-        {
-            updateCommandVelocity(0,0);
-            ros::Duration(2).sleep();
-            i += 1;
-        }
+          updateCommandVelocity(0,0);
+          ros::Duration(2).sleep();
+          i += 1;
       }
-      
     }       
     else            // rotate
     {
-      if ( abs(sensor_goal[i] - target_goal[i]) > 0.1 || cmd_ang_ > 0.005)
+      if ( abs(sensor_goal[i] - target_goal[i]) > 0.1 )
       {
-        feedback.rotate(sensor_goal[i],target_goal[i],false);
+          if (i != 3)
+          {
+              feedback.rotate(sensor_goal[i],target_goal[i],false);
+          }
+          else
+          {
+              feedback.rotate(sensor_goal[i],target_goal[i],true);
+          }
       }
       else
       {
@@ -300,18 +271,14 @@ bool SimulationDrive::simulationLoop()
           i += 1;
       }
     }
-
-
-      // y1.push_back(pose_odom_pos_x);
-      // y1u.push_back(out);
-      
-      // std::string name_s = "sensor" + i;
-
-      // feedback.write_to_file(y1, name_s);
-      // feedback.write_to_file(y1u, "input");
+  
     
 
-    
+
+
+    // driveStraight(round%2,0,0,pose_odom_pos_y,(round-1)*dist_rows_y,false,1);
+
+    // rotate(pose_odom_rot,90,false);
   }
   else
   {
@@ -319,6 +286,8 @@ bool SimulationDrive::simulationLoop()
   }
   return true;
 }
+
+
 
 
 

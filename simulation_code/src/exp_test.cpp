@@ -38,14 +38,21 @@ bool SimulationDrive::init()
   cmd_vel_pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 10);
   init_pose_pub_ = nh_.advertise<geometry_msgs::PoseWithCovarianceStamped>("initialpose", 10);
   // env_pub_ = nh_.advertise<std_msgs::String>("environment", 10);
+  steer_pub_ = nh_.advertise<std_msgs::Float64>("steer", 10);
+
 
   // initialize subscribers
   // laser_scan_sub_  = nh_.subscribe("scan", 10, &SimulationDrive::laserScanMsgCallBack, this);
-  odom_sub_ = nh_.subscribe("odom", 10, &SimulationDrive::odomMsgCallBack, this);
+  odom_sub_ = nh_.subscribe("odometry/filtered_map", 10, &SimulationDrive::odomMsgCallBack, this);
+  // odom_sub_ = nh_.subscribe("odom", 10, &SimulationDrive::odomMsgCallBack, this);
+  
+  
   // pose_sub_ = nh_.subscribe("amcl_pose", 10, &SimulationDrive::poseMsgCallBack, this);
   localization_sub_ = nh_.subscribe("localization", 10, &SimulationDrive::localizationCallBack, this);
   environment_sub_ = nh_.subscribe("environment", 10, &SimulationDrive::environmentCallBack, this);
   obstacle_sub_ = nh_.subscribe("obstacle", 10, &SimulationDrive::obstacleCallBack, this);
+  cmd_vel_sub_ = nh_.subscribe("cmd_vel", 10, &SimulationDrive::commandVelocityCallBack, this);
+
 
   // ROS_INFO_STREAM("x: ");
   // std::cin >> init_x;
@@ -121,6 +128,12 @@ void SimulationDrive::obstacleCallBack(const std_msgs::Bool::ConstPtr &msg)
   obst_ = msg->data;
 }
 
+void SimulationDrive::commandVelocityCallBack(const geometry_msgs::Twist::ConstPtr &msg)
+{
+  cmd_lin_ = msg->linear.x;
+  cmd_ang_ = msg->angular.z;
+}
+
 
 
 
@@ -182,6 +195,15 @@ void SimulationDrive::updateEnvironment(std::string environment)
   env_pub_.publish(env);
 }
 
+void SimulationDrive::updateSteerAngle(double angle)
+{
+  std_msgs::Float64 ang;
+
+  ang.data = angle;
+
+  steer_pub_.publish(ang);
+}
+
 
 
 
@@ -227,9 +249,74 @@ bool SimulationDrive::simulationLoop()
     // driveStraight(0,0,0,pose_odom_pos_y,0,false,-1);
 
 
-    // to goal
-    feedback.driveStraight(3,pose_odom_pos_y,1,pose_odom_pos_x,0);
+  //-------------------- pid tuning -----------------------------
+    
+    // angle goal
+    // double out = feedback.rotate(pose_odom_rot, 0, false);
+    
+    // position goal
+    // double out = feedback.driveStraight(0,pose_odom_pos_x,0,pose_odom_pos_y,2);
+  
 
+
+
+
+    // line follow
+    if (i == 0)   // drive straight
+    {
+      if ( (abs(pose_odom_pos_x - 0) > 0.05) || (cmd_lin_ > 0.01) )
+      {
+        feedback.driveStraight(0,pose_odom_pos_x,0,pose_odom_pos_y,2);
+      }
+      else
+      {
+        updateCommandVelocity(0,0);
+        ros::Duration(1).sleep();
+        i += 1;
+      }
+    }       
+    else if (i == 1)            // rotate
+    {
+      if ( (abs(pose_odom_rot - (-90)) > 0.1) || (cmd_ang_ > 0.005) )
+      {
+        feedback.rotate(pose_odom_rot, -90, false);
+      }
+      else
+      {
+        updateCommandVelocity(0,0);
+        ros::Duration(2).sleep();
+        i += 1;
+      }
+    }
+    else if (i == 2)            // rotate
+    {
+      if ( (abs(pose_odom_rot - (-90)) > 0.1) || (cmd_ang_ > 0.005) )
+      {
+        feedback.rotate(pose_odom_rot, -90, false);
+      }
+      else
+      {
+        updateCommandVelocity(0,0);
+        ros::Duration(1).sleep();
+        i += 1;
+      }
+    }
+    else if (i == 3)
+    {
+      double out = feedback.driveStraight(1,0,0,pose_odom_rot,-90,false,1);
+
+      y1.push_back(pose_odom_pos_x);
+      y1u.push_back(out);
+      // y2u.push_back(cmd_ang_);
+      
+      feedback.write_to_file(y1, "sensor");
+      feedback.write_to_file(y1u, "input");
+      // feedback.write_to_file(y2u, "input_cmd");
+    }
+
+
+
+    
   }
   else
   {

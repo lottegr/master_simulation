@@ -1,6 +1,6 @@
 image: /home/trazy/catkin_ws/src/master_simulation/robot_navigation_params/map/map.pgm
 resolution: 0.050000
-origin: [-50.9, -50, 0.0]
+origin: [-51, -50, 0.0]
 negate: 0
 occupied_thresh: 0.65
 free_thresh: 0.196

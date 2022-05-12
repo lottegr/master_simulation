@@ -27,6 +27,7 @@
 #include <geometry_msgs/Twist.h>
 #include <nav_msgs/Odometry.h>
 #include <std_msgs/Bool.h>
+#include <std_msgs/Float64.h>
 
 #include "geometry_msgs/Pose.h"
 #include "geometry_msgs/PoseStamped.h"
@@ -49,7 +50,7 @@
 
 // real
 #define lin_vel   0.2
-#define ang_vel   0.4
+#define ang_vel   0.5
 
 #define dist_rows_y   1.5
 #define dist_rows_x   4
@@ -120,6 +121,14 @@ class FeedbackFunctions
   void updateCommandVelocity(double linear, double angular);
   void odomMsgCallBack(const nav_msgs::Odometry::ConstPtr &msg);
   // void poseMsgCallBack(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr &msg);
+
+
+
+  ros::Publisher steer_pub_;
+  void updateSteerAngle(double angle);
+
+  double prev = 0;
+
 
 
 };

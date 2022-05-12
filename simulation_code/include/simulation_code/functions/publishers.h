@@ -32,7 +32,7 @@
 
 // real
 #define lin_vel   0.2
-#define ang_vel   0.4
+#define ang_vel   0.5
 
 #define dist_rows_y   1.5
 #define dist_rows_x   4

@@ -32,9 +32,10 @@ bool FeedbackFunctions::init()
 
   // initialize publishers
   cmd_vel_pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 10);
+  steer_pub_ = nh_.advertise<std_msgs::Float64>("steer", 10);
 
   // initialize subscribers
-  odom_sub_ = nh_.subscribe("odom", 10, &FeedbackFunctions::odomMsgCallBack, this);
+  odom_sub_ = nh_.subscribe("odometry/filtered_map", 10, &FeedbackFunctions::odomMsgCallBack, this);
   // pose_sub_ = nh_.subscribe("amcl_pose", 10, &FeedbackFunctions::poseMsgCallBack, this);
 
   return true;
@@ -85,13 +86,28 @@ void FeedbackFunctions::updateCommandVelocity(double linear, double angular)
   cmd_vel_pub_.publish(cmd_vel);
 }
 
+void FeedbackFunctions::updateSteerAngle(double angle)
+{
+  std_msgs::Float64 ang;
+
+  ang.data = angle;
+
+  steer_pub_.publish(ang);
+}
+
+
+
+
+
+
+
 
 
 
 
 double FeedbackFunctions::rotate(double sensor, double target, bool over180)
 {
-  PID pid_ang = PID(0.1,ang_vel,-ang_vel, 0.01, 0.005, 0.05);
+  PID pid_ang = PID(0.1,0.8*ang_vel,-0.8*ang_vel, 0.02,0,0);
 
   if (over180){
     if (pose_odom_rot > 0){
@@ -113,8 +129,10 @@ double FeedbackFunctions::driveStraight(int dir, double sensor_lin, double targe
 {
   if (target_pos)
   {
-    PID pid_lin = PID(0.1,lin_vel,-lin_vel, 1, 0.05, 0.5);
-    PID pid_ang = PID(0.1,ang_vel,-ang_vel, 1, 0.05, 0);         // droppe D-term ??
+    // PID pid_lin = PID(0.1,lin_vel,-lin_vel, 1, 0.05, 0.5);
+    PID pid_lin = PID(0.1,lin_vel,-lin_vel, 1, 0, 0.5);
+
+    PID pid_ang = PID(0.1,ang_vel,-ang_vel, 1, 0, 0);         // droppe D-term ??
     
     double output_lin = pid_lin.calculate(target_lin,sensor_lin);
     // double output_ang = pid_ang.calculate(target_ang,sensor_ang);
@@ -129,13 +147,22 @@ double FeedbackFunctions::driveStraight(int dir, double sensor_lin, double targe
       updateCommandVelocity(-output_lin, output_ang);
     }
 
-    return output_lin, output_ang;
+    return output_lin;
   }
 
   else
   {
-    PID pid = PID(0.1,ang_vel,-ang_vel, 1, 0.05, 0);
+    // double P = 0.2;
+    // double I = P;
+    // double D = 10*P;
+    PID pid = PID(0.1,ang_vel,-ang_vel, 0.5, 0.02, 2.5);
     double output = pid.calculate(target_ang,sensor_ang);
+    
+    // updateSteerAngle(output_ang);
+    // output = out - prev;
+
+    // double ang_ = lin_vel/0.717 *tan(output);
+
     if (dir == 1)
     {
       updateCommandVelocity(direction*lin_vel, direction*output);
@@ -144,7 +171,28 @@ double FeedbackFunctions::driveStraight(int dir, double sensor_lin, double targe
     {
       updateCommandVelocity(direction*lin_vel, -direction*output);
     }
+
+    // double prev = out;
+
+    return output;
   }
 
+}
+
+void FeedbackFunctions::write_to_file(std::vector<double> v, std::string name)
+{
+  name = name + ".txt";
+  
+  std::ofstream outFile;
+  outFile.open(name);
+  if (!outFile.is_open()){
+    ROS_INFO_STREAM("failed to open file");
+  }
+  else{
+    for (const auto &e : v) outFile << e << "\n";
+  }
+  outFile.close();
+
+  return;
 }
 

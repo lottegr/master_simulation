@@ -50,7 +50,7 @@
 
 // real
 #define lin_vel   0.2
-#define ang_vel   0.4
+#define ang_vel   0.5
 
 #define dist_rows_y   1.5
 #define dist_rows_x   4
@@ -111,6 +111,8 @@ class SimulationDrive
   ros::Subscriber localization_sub_;
   ros::Subscriber environment_sub_;
   ros::Subscriber obstacle_sub_;
+  ros::Subscriber cmd_vel_sub_;
+
 
   // ROS Action Clients
   typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> status_client_;
@@ -128,7 +130,7 @@ class SimulationDrive
   double pose_pos_x;
   double pose_pos_y;
   double pose_odom_rot;
-  double pose_odom_pos_x;
+  double pose_odom_pos_x = 1;
   double pose_odom_pos_y;
   double twist_odom_lin;
   double twist_odom_ang;
@@ -139,6 +141,8 @@ class SimulationDrive
   std::string section_;
   std::string env_;
   bool obst_;
+  double cmd_lin_;
+  double cmd_ang_;
 
   bool drive_f = true;
   bool drive_b = false;
@@ -160,6 +164,8 @@ class SimulationDrive
   void localizationCallBack(const simulation_code::LocalizationConstPtr &msg);
   void environmentCallBack(const std_msgs::StringConstPtr &msg);
   void obstacleCallBack(const std_msgs::Bool::ConstPtr &msg);
+  void commandVelocityCallBack(const geometry_msgs::TwistConstPtr &msg);
+
 
   void makeUturn(int round);
 
@@ -191,6 +197,22 @@ class SimulationDrive
 
 
   double output_ang_prev = 0;
+
+
+
+  double prev = 0;
+
+
+
+
+  ros::Publisher steer_pub_;
+  void updateSteerAngle(double angle);
+
+
+
+
+
+
 
 };
 #endif // SIMUDRIVE_H_
