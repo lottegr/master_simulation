@@ -305,13 +305,13 @@ bool SimulationDrive::simulationLoop()
     {
       double out = feedback.driveStraight(1,0,0,pose_odom_rot,-90,false,1);
 
-      y1.push_back(pose_odom_pos_x);
-      y1u.push_back(out);
-      // y2u.push_back(cmd_ang_);
-      
-      feedback.write_to_file(y1, "sensor");
-      feedback.write_to_file(y1u, "input");
-      // feedback.write_to_file(y2u, "input_cmd");
+      // y1.push_back(pose_odom_pos_x);
+      // y1u.push_back(out);
+
+    
+      // feedback.write_to_file(y1, "sensor");
+      // feedback.write_to_file(y1u, "input");
+
     }
 
 

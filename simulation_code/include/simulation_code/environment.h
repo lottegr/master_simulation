@@ -73,7 +73,7 @@ class Environment
   typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> status_client_;
 
   // Variables
-  double forward_dist_ = 0.6;
+  double forward_dist_ = 1;
   double side_dist_ = 1;
 
   double scan_data_[4] = {10,10,10,10};

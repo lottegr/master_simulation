@@ -5,8 +5,9 @@ import numpy as np
 
 # ------------
 
-plot_nr = "4"
+plot_nr = "2"
 ref = 0
+
 xlab = 'Angle [deg]'
 ulab = 'Angular velocity [rad/s]'
 

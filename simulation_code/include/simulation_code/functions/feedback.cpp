@@ -110,7 +110,7 @@ double FeedbackFunctions::rotate(double sensor, double target, bool over180)
   PID pid_ang = PID(0.1,0.8*ang_vel,-0.8*ang_vel, 0.02,0,0);
 
   if (over180){
-    if (pose_odom_rot > 0){
+    if (sensor > 0){
       sensor = sensor;
     } else {
       sensor = 360 + sensor;

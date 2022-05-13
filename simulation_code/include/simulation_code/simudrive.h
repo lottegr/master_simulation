@@ -130,7 +130,7 @@ class SimulationDrive
   double pose_pos_x;
   double pose_pos_y;
   double pose_odom_rot;
-  double pose_odom_pos_x = 1;
+  double pose_odom_pos_x;
   double pose_odom_pos_y;
   double twist_odom_lin;
   double twist_odom_ang;
@@ -166,34 +166,33 @@ class SimulationDrive
   void obstacleCallBack(const std_msgs::Bool::ConstPtr &msg);
   void commandVelocityCallBack(const geometry_msgs::TwistConstPtr &msg);
 
-
   void makeUturn(int round);
 
   // std::ofstream outFile;
-  std::vector<double> y1;
-  std::vector<double> y2;
-  std::vector<double> y3;
-  std::vector<double> y4;
-  std::vector<double> y5;
-  std::vector<double> l1;
-  std::vector<double> l3;
-  std::vector<double> l5;
+  // std::vector<double> y1;
+  // std::vector<double> y2;
+  // std::vector<double> y3;
+  // std::vector<double> y4;
+  // std::vector<double> y5;
+  // std::vector<double> l1;
+  // std::vector<double> l3;
+  // std::vector<double> l5;
 
-  std::vector<double> y1u;
-  std::vector<double> y2u;
-  std::vector<double> y3u;
-  std::vector<double> y4u;
-  std::vector<double> y5u;
-  std::vector<double> l1u;
-  std::vector<double> l3u;
-  std::vector<double> l5u;
+  // std::vector<double> y1u;
+  // std::vector<double> y2u;
+  // std::vector<double> y3u;
+  // std::vector<double> y4u;
+  // std::vector<double> y5u;
+  // std::vector<double> l1u;
+  // std::vector<double> l3u;
+  // std::vector<double> l5u;
 
-  std::vector<double> px;
-  std::vector<double> py;
-  std::vector<double> pa;
+  // std::vector<double> px;
+  // std::vector<double> py;
+  // std::vector<double> pa;
 
 
-  std::vector<double> twist;
+  // std::vector<double> twist;
 
 
   double output_ang_prev = 0;
@@ -208,11 +207,17 @@ class SimulationDrive
   ros::Publisher steer_pub_;
   void updateSteerAngle(double angle);
 
+  std::vector<double> x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12;
+  std::vector<double> y0, y1, y2, y3, y4, y5, y6, y7, y8, y9, y10, y11, y12;
+  std::vector<double> z0, z1, z2, z3, z4, z5, z6, z7, z8, z9, z10, z11, z12;
 
+  std::vector<std::vector<double>> x_vecs = {x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12};
+  std::vector<std::vector<double>> y_vecs = {y0, y1, y2, y3, y4, y5, y6, y7, y8, y9, y10, y11, y12};
+  std::vector<std::vector<double>> z_vecs = {z0, z1, z2, z3, z4, z5, z6, z7, z8, z9, z10, z11, z12};
 
-
-
-
+  std::vector<std::string> x_names = {"x0", "x1", "x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12"};
+  std::vector<std::string> y_names = {"y0", "y1", "y2", "y3", "y4", "y5", "y6", "y7", "y8", "y9", "y10", "y11", "y12"};
+  std::vector<std::string> z_names = {"z0", "z1", "z2", "z3", "z4", "z5", "z6", "z7", "z8", "z9", "z10", "z11", "z12"};
 
 };
 #endif // SIMUDRIVE_H_

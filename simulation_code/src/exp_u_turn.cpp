@@ -53,16 +53,6 @@ bool SimulationDrive::init()
   obstacle_sub_ = nh_.subscribe("obstacle", 10, &SimulationDrive::obstacleCallBack, this);
   cmd_vel_sub_ = nh_.subscribe("cmd_vel", 10, &SimulationDrive::commandVelocityCallBack, this);
 
-
-  // ROS_INFO_STREAM("x: ");
-  // std::cin >> init_x;
-  // ROS_INFO_STREAM("y: "); 
-  // std::cin >> init_y;
-  // ROS_INFO_STREAM("z: ");
-  // std::cin >> init_z;
-
-  // updateInitialPose(init_x, init_y, init_z);
-
   return true;
 }
 
@@ -256,7 +246,7 @@ bool SimulationDrive::simulationLoop()
                                         0, 
                                         0, 
                                        -90, 
-                                       0};
+                                        0};
     // std::vector<double> target_line = {0, 0, 
     //                                    move_x_1, 0, 
     //                                    row2};
@@ -301,11 +291,17 @@ bool SimulationDrive::simulationLoop()
       }
     }
 
+    x_vecs[i].push_back(pose_odom_pos_x);
+    y_vecs[i].push_back(pose_odom_pos_y);
+    z_vecs[i].push_back(pose_odom_rot);
+
+    feedback.write_to_file(x_vecs[i], x_names[i]); 
+    feedback.write_to_file(y_vecs[i], y_names[i]); 
+    feedback.write_to_file(z_vecs[i], z_names[i]); 
+    
 
       // y1.push_back(pose_odom_pos_x);
       // y1u.push_back(out);
-      
-      // std::string name_s = "sensor" + i;
 
       // feedback.write_to_file(y1, name_s);
       // feedback.write_to_file(y1u, "input");

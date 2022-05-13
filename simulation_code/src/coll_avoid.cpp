@@ -77,6 +77,10 @@ void CollisionAvoid::laserScanMsgCallBack(const sensor_msgs::LaserScan::ConstPtr
       scan_data_[num] = msg->ranges.at(scan_angle[num]);
     }
   }
+  ROS_INFO_STREAM(scan_data_[0]);
+  ROS_INFO_STREAM(scan_data_[1]);
+  ROS_INFO_STREAM(scan_data_[2]);
+  ROS_INFO_STREAM(scan_data_[3]);
 }
 
 

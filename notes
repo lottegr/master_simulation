@@ -54,3 +54,7 @@ source ros-versions:
 Videre arbeid:
 - sjekke rails før entering -> logge manglene rails -> kunne kjøre tilbake til manglende rails (feks her hadde jeg trengt den generateGoal(points) )
 
+Discussion: 
+- ikke prøvd å kjøre bakover (?i think)
+
+

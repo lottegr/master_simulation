@@ -287,18 +287,18 @@ void SimulationDrive::makeUturn(int row)
     if ( abs(sensor - target) > 0.05 )
     {
       double output_lin, output_ang = driveStraight(row%2, sensor, target, sensor_, target_);
-      y1.push_back(sensor);
-      y1u.push_back(output_lin);
-      l1.push_back(sensor_);
-      l1u.push_back(output_ang);
+      // y1.push_back(sensor);
+      // y1u.push_back(output_lin);
+      // l1.push_back(sensor_);
+      // l1u.push_back(output_ang);
     }
     else
     {
       updateCommandVelocity(0,0);
-      write_to_file(y1,"y1");
-      write_to_file(y1u,"y1u");
-      write_to_file(l1,"l1");
-      write_to_file(l1u,"l1u");
+      // write_to_file(y1,"y1");
+      // write_to_file(y1u,"y1u");
+      // write_to_file(l1,"l1");
+      // write_to_file(l1u,"l1u");
       ros::Duration(2).sleep();
       turn_step += 1;
     }
@@ -325,14 +325,14 @@ void SimulationDrive::makeUturn(int row)
       if ( abs(sensor - target) > 0.1 )
       {
         double output_ang = rotate(sensor,target,over180);
-        y2.push_back(sensor);
-        y2u.push_back(output_ang);
+        // y2.push_back(sensor);
+        // y2u.push_back(output_ang);
       }
       else
       {
         updateCommandVelocity(0,0);
-        write_to_file(y2,"y2");
-        write_to_file(y2u,"y2u");
+        // write_to_file(y2,"y2");
+        // write_to_file(y2u,"y2u");
         ros::Duration(2).sleep();
         turn_step += 1;
       }
@@ -352,18 +352,18 @@ void SimulationDrive::makeUturn(int row)
     {
       double output_lin, output_ang = driveStraight(2, sensor, target, sensor_, target_);
       // updateCommandVelocity(output_lin, -output_ang); 
-      y3.push_back(sensor);
-      y3u.push_back(output_lin);
-      l3.push_back(sensor_);
-      l3u.push_back(output_ang);
+      // y3.push_back(sensor);
+      // y3u.push_back(output_lin);
+      // l3.push_back(sensor_);
+      // l3u.push_back(output_ang);
     }
     else
     {
       updateCommandVelocity(0,0); 
-      write_to_file(y3,"y3");
-      write_to_file(y3u,"y3u");
-      write_to_file(l3,"l3");
-      write_to_file(l3u,"l3u");
+      // write_to_file(y3,"y3");
+      // write_to_file(y3u,"y3u");
+      // write_to_file(l3,"l3");
+      // write_to_file(l3u,"l3u");
       ros::Duration(2).sleep();
       turn_step += 1;
     }
@@ -388,14 +388,14 @@ void SimulationDrive::makeUturn(int row)
     {
       double output_ang = rotate(sensor,target, over180);
       updateCommandVelocity(0, output_ang); 
-      y4.push_back(sensor);
-      y4u.push_back(output_ang);
+      // y4.push_back(sensor);
+      // y4u.push_back(output_ang);
     }
     else
     {
       updateCommandVelocity(0,0);
-      write_to_file(y4,"y4");
-      write_to_file(y4u,"y4u");
+      // write_to_file(y4,"y4");
+      // write_to_file(y4u,"y4u");
       ros::Duration(2).sleep();
       turn_step += 1;
       round += 1;
@@ -416,10 +416,10 @@ void SimulationDrive::makeUturn(int row)
     if ( abs(sensor - target) > 0.05 )
     {
       double output_lin, output_ang = driveStraight(row%2, sensor, target, sensor_, target_);               // bool false??
-      y5.push_back(sensor);
-      y5u.push_back(output_lin);
-      l5.push_back(sensor_);
-      l5u.push_back(output_ang);
+      // y5.push_back(sensor);
+      // y5u.push_back(output_lin);
+      // l5.push_back(sensor_);
+      // l5u.push_back(output_ang);
     }
     // else if (environment == "rail_f")
     // {
@@ -440,20 +440,20 @@ void SimulationDrive::makeUturn(int row)
 
   // plotting position
 
-  px.push_back(pose_odom_pos_x);
-  py.push_back(pose_odom_pos_y);
-  pa.push_back(pose_odom_rot);
+  // px.push_back(pose_odom_pos_x);
+  // py.push_back(pose_odom_pos_y);
+  // pa.push_back(pose_odom_rot);
 
 
 
-  write_to_file(px,"px");
-  write_to_file(py,"py");
-  write_to_file(pa,"pa");
+  // write_to_file(px,"px");
+  // write_to_file(py,"py");
+  // write_to_file(pa,"pa");
   
-  write_to_file(y5,"y5");
-  write_to_file(y5u,"y5u");
-  write_to_file(l5,"l5");
-  write_to_file(l5u,"l5u");
+  // write_to_file(y5,"y5");
+  // write_to_file(y5u,"y5u");
+  // write_to_file(l5,"l5");
+  // write_to_file(l5u,"l5u");
 
 }
 
