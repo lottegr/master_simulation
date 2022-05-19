@@ -51,7 +51,12 @@ class CollisionAvoid
   double pose_odom_rot;
   double pose_odom_pos_x;
   double pose_odom_pos_y;
+  double scan_data[28] = {10,10,10,10,10,10,10,
+                          10,10,10,10,10,10,10,
+                          10,10,10,10,10,10,10,
+                          10,10,10,10,10,10,10};
   double scan_data_[4] = {10,10,10,10};
+
   double row_;
   std::string section_;
   std::string env_;

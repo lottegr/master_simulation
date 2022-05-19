@@ -107,7 +107,7 @@ void FeedbackFunctions::updateSteerAngle(double angle)
 
 double FeedbackFunctions::rotate(double sensor, double target, bool over180)
 {
-  PID pid_ang = PID(0.1,0.8*ang_vel,-0.8*ang_vel, 0.02,0,0);
+  PID pid_ang = PID(0.1,0.8*ang_vel,-0.8*ang_vel, 0.02,0.0002,0);
 
   if (over180){
     if (sensor > 0){
@@ -130,38 +130,30 @@ double FeedbackFunctions::driveStraight(int dir, double sensor_lin, double targe
   if (target_pos)
   {
     // PID pid_lin = PID(0.1,lin_vel,-lin_vel, 1, 0.05, 0.5);
-    PID pid_lin = PID(0.1,lin_vel,-lin_vel, 1, 0, 0.5);
+    PID pid_lin = PID(0.1,lin_vel,-lin_vel, 1, 0.05, 0);
 
     PID pid_ang = PID(0.1,ang_vel,-ang_vel, 1, 0, 0);         // droppe D-term ??
     
     double output_lin = pid_lin.calculate(target_lin,sensor_lin);
     // double output_ang = pid_ang.calculate(target_ang,sensor_ang);
     double output_ang = 0;
-    if (dir == 1){
-      updateCommandVelocity(output_lin, output_ang); 
-    } else if (dir == 0) {
-      updateCommandVelocity(-output_lin, -output_ang); 
-    } else if (dir == 2) {
+    if (dir == 0) {
       updateCommandVelocity(output_lin, -output_ang);
-    } else if (dir == 3) {
+    } else if (dir == 1){
+      updateCommandVelocity(output_lin, output_ang); 
+    } else if (dir == 2) {
       updateCommandVelocity(-output_lin, output_ang);
-    }
+    } else if (dir == 3) {
+      updateCommandVelocity(-output_lin, -output_ang); 
+    } 
 
     return output_lin;
   }
 
   else
   {
-    // double P = 0.2;
-    // double I = P;
-    // double D = 10*P;
     PID pid = PID(0.1,ang_vel,-ang_vel, 0.5, 0.02, 2.5);
     double output = pid.calculate(target_ang,sensor_ang);
-    
-    // updateSteerAngle(output_ang);
-    // output = out - prev;
-
-    // double ang_ = lin_vel/0.717 *tan(output);
 
     if (dir == 1)
     {

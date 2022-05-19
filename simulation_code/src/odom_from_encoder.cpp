@@ -27,6 +27,7 @@
 // Include various libraries
 #include "ros/ros.h"
 #include "std_msgs/Int64.h"
+#include "std_msgs/String.h"
 #include <nav_msgs/Odometry.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <tf2/LinearMath/Quaternion.h>
@@ -50,8 +51,8 @@ const double PI = 3.141592;
 // Robot physical constants
 const double TICKS_PER_REVOLUTION = 5720.82; // For reference purposes.
 const double WHEEL_RADIUS = 0.256; // Wheel radius in meters
-const double WHEEL_BASE = 0.717; // Center of left tire to center of right tire
-const double TICKS_PER_METER = 3666;
+double WHEEL_BASE = 0.717; // Center of left tire to center of right tire
+double TICKS_PER_METER = 3666;
 
 // const double WHEEL_RADIUS = 0.185; // Wheel radius in meters
 // const double WHEEL_BASE = 0.555; // Center of left tire to center of right tire
@@ -117,6 +118,23 @@ void Calc_Right(const std_msgs::Int64& rightCount) {
   lastCountR = rightCount.data;
 }
  
+// find driving enviornment to decide robot parameters
+void findEnv(const std_msgs::String& env) 
+{  
+  std::string env_ = env.data;
+
+  if (env_.substr(0,4) == "rail" || env_.substr(0,3) == "end")
+  {
+    // ROS_INFO_STREAM("rail");
+    WHEEL_BASE = 0.555; 
+    TICKS_PER_METER = 4921.6;
+  }
+  else
+  {
+    WHEEL_BASE = 0.717;
+    TICKS_PER_METER = 3666;
+  }
+}
 
 
 // Publish a nav_msgs::Odometry message in quaternion format
@@ -271,6 +289,7 @@ int main(int argc, char **argv) {
   ros::Subscriber subForRightCounts = node.subscribe("/right_encoder", 100, Calc_Right);
   ros::Subscriber subForLeftCounts = node.subscribe("/left_encoder", 100, Calc_Left, ros::TransportHints().tcpNoDelay());
   ros::Subscriber subInitialPose = node.subscribe("initialpose", 1, set_initial_2d);
+  ros::Subscriber subEnvironment = node.subscribe("/environment_exp", 100, findEnv);
 
   // Publisher of simple odom message where orientation.z is an euler angle
   odom_data_pub = node.advertise<nav_msgs::Odometry>("odom_data_euler", 100);

@@ -250,9 +250,9 @@ bool SimulationDrive::simulationLoop()
     // std::vector<double> target_line = {0, 0, 
     //                                    move_x_1, 0, 
     //                                    row2};
-    std::vector<double> dirs = {2, 0,
+    std::vector<double> dirs = {0, 0,
                                 1, 0,
-                                3};
+                                2};
 
     ROS_INFO_STREAM("Step: " << i << ", goal: " << target_goal[i] << ", measurement: " << sensor_goal[i]);
 
@@ -260,13 +260,16 @@ bool SimulationDrive::simulationLoop()
     {
       if (i==4)
       {
-        double out = feedback.driveStraight(1,0,0,sensor_goal[i],target_goal[i],false,1);
+        // double out = feedback.driveStraight(1,0,0,sensor_goal[i],target_goal[i],false,1);
+        // u_vecs[i].push_back(cmd_ang_);
+        updateCommandVelocity(lin_vel, 0); 
       }
       else 
       {
         if ( abs(sensor_goal[i] - target_goal[i]) > 0.05 || cmd_lin_ > 0.005 )
         {
           feedback.driveStraight(dirs[i],sensor_goal[i],target_goal[i],0,0);
+          u_vecs[i].push_back(cmd_lin_);
         }
         else
         {
@@ -289,6 +292,7 @@ bool SimulationDrive::simulationLoop()
           ros::Duration(2).sleep();
           i += 1;
       }
+      u_vecs[i].push_back(cmd_ang_);
     }
 
     x_vecs[i].push_back(pose_odom_pos_x);
@@ -298,7 +302,7 @@ bool SimulationDrive::simulationLoop()
     feedback.write_to_file(x_vecs[i], x_names[i]); 
     feedback.write_to_file(y_vecs[i], y_names[i]); 
     feedback.write_to_file(z_vecs[i], z_names[i]); 
-    
+    feedback.write_to_file(u_vecs[i], u_names[i]); 
 
       // y1.push_back(pose_odom_pos_x);
       // y1u.push_back(out);
@@ -311,6 +315,7 @@ bool SimulationDrive::simulationLoop()
   }
   else
   {
+    ROS_WARN("Obstacle in path, waiting for 3 seconds.");
     updateCommandVelocity(0,0);
   }
   return true;

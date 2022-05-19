@@ -39,7 +39,7 @@ bool Environment::init()
 
 void Environment::laserScanMsgCallBack(const sensor_msgs::LaserScan::ConstPtr &msg)
 {
-  uint16_t scan_angle[4] = {0, 90, 180, 270};
+  uint16_t scan_angle[4] = {1011, 1515, 5, 506};
 
   for (int num = 0; num < 4; num++)
   {
@@ -127,7 +127,7 @@ bool Environment::simulationLoop()
   }
   else                                                                              // if (obstacle ahead)                                                                                
   {
-    if (scan_data_[left] < side_dist_ && scan_data_[right] < side_dist_)            // if (on rail)
+    if (abs(pose_odom_pos_x) < 1 && pose_odom_pos_y < 0.4)                          // if (on rail)
     {
       if (scan_data_[forward] < forward_dist_) 
       {

@@ -17,7 +17,7 @@ for file in listdir():
         txt = open(file,'r')        
         lines = txt.readlines()
         for l in lines:
-            if float(l) != 0:
+            if abs(float(l)) > 1e-100:
                 plots[name].append(float(l))
 
 # step 1,3,5 - linear
@@ -112,7 +112,7 @@ for file in listdir():
 
 px = []; py = []; pz = []
 
-for i in range(5):
+for i in range(13):
     xname = 'x' + str(i)
     yname = 'y' + str(i)
     zname = 'z' + str(i)
@@ -121,14 +121,26 @@ for i in range(5):
     py += plots[yname]
     pz += plots[zname]
 
+    # print(i, "-", len(plots[xname]), "-", len(plots[yname]))
+
 x0 = plots['x0'][0]
 y0 = plots['y0'][0]
 
 
 plt.figure(4)
-plt.plot([x0,x0],[y0,2.6],'r--')
-plt.plot([x0,0],[2.6,2.6],'r--')
-plt.plot([0,0],[2.6,0],'r--')
+# # u-turn
+# plt.plot([x0,x0],[y0,2.6],'r--')
+# plt.plot([x0,0],[2.6,2.6],'r--')
+# plt.plot([0,0],[2.6,0],'r--')
+
+# exit-enter
+plt.plot([0,0],[y0,3.5],'r--')
+plt.plot([0,2],[3.5,3.5],'r--')
+plt.plot([2,2],[3.5,4.5],'r--')
+plt.plot([2,1.25],[4.5,4.5],'r--')
+plt.plot([1.25,1.25],[4.5,2.5],'r--')
+plt.plot([1.25,0],[2.5,2.5],'r--')
+plt.plot([0,0],[2.5,0],'r--')
 
 plt.plot(px,py)
 plt.title('position')

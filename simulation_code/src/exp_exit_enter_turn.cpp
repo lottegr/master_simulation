@@ -255,24 +255,24 @@ bool SimulationDrive::simulationLoop()
                                         2, 
                                         90, 
                                        4.5,
-                                       180,
-                                        1,
-                                       -90,
+                                        0,
+                                       1.25,
+                                        90,
                                        2.5,
-                                       180,
+                                        0,
                                         0,
                                        -90,
                                         0};
     // std::vector<double> target_line = {0, 0, 
     //                                    move_x_1, 0, 
     //                                    row2};
-    std::vector<double> dirs = {2, 0,
-                                1, 0,
-                                2, 0,
+    std::vector<double> dirs = {0, 0,
                                 0, 0,
-                                3, 0,
                                 0, 0,
-                                3};
+                                0, 0,
+                                0, 0,
+                                0, 0,
+                                0};
 
     ROS_INFO_STREAM("Step: " << i << ", goal: " << target_goal[i] << ", measurement: " << sensor_goal[i]);
 
@@ -280,13 +280,22 @@ bool SimulationDrive::simulationLoop()
     {
       if (i==12)
       {
-        double out = feedback.driveStraight(1,0,0,sensor_goal[i],target_goal[i],false,1);
+        // if (env_.substr(0,4) != "rail")
+        // {
+        //   double out = feedback.driveStraight(1,0,0,sensor_goal[i],target_goal[i],false,1);
+        //   u_vecs[i].push_back(cmd_ang_);
+        // }
+        // else
+        {
+          updateCommandVelocity(lin_vel,0);
+        }
       }
       else 
       {
         if ( abs(sensor_goal[i] - target_goal[i]) > 0.05 || cmd_lin_ > 0.005 )
         {
           feedback.driveStraight(dirs[i],sensor_goal[i],target_goal[i],0,0);
+          u_vecs[i].push_back(cmd_lin_);
         }
         else
         {
@@ -301,12 +310,7 @@ bool SimulationDrive::simulationLoop()
     {
       if ( abs(sensor_goal[i] - target_goal[i]) > 0.1 || cmd_ang_ > 0.005)
       {
-        if (i < 4) {
-          feedback.rotate(sensor_goal[i],target_goal[i],false);
-        } else {
-          feedback.rotate(sensor_goal[i],target_goal[i],true);
-        }
-        
+        feedback.rotate(sensor_goal[i],target_goal[i],false);
       }
       else
       {
@@ -314,7 +318,10 @@ bool SimulationDrive::simulationLoop()
           ros::Duration(2).sleep();
           i += 1;
       }
+      u_vecs[i].push_back(cmd_ang_);
     }
+  
+    
 
     x_vecs[i].push_back(pose_odom_pos_x);
     y_vecs[i].push_back(pose_odom_pos_y);
@@ -323,6 +330,7 @@ bool SimulationDrive::simulationLoop()
     feedback.write_to_file(x_vecs[i], x_names[i]); 
     feedback.write_to_file(y_vecs[i], y_names[i]); 
     feedback.write_to_file(z_vecs[i], z_names[i]); 
+    feedback.write_to_file(u_vecs[i], u_names[i]); 
     
 
       // y1.push_back(pose_odom_pos_x);
@@ -336,6 +344,7 @@ bool SimulationDrive::simulationLoop()
   }
   else
   {
+    ROS_WARN("Obstacle in path, waiting for 3 seconds.");
     updateCommandVelocity(0,0);
   }
   return true;

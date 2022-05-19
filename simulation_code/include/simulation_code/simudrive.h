@@ -210,14 +210,17 @@ class SimulationDrive
   std::vector<double> x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12;
   std::vector<double> y0, y1, y2, y3, y4, y5, y6, y7, y8, y9, y10, y11, y12;
   std::vector<double> z0, z1, z2, z3, z4, z5, z6, z7, z8, z9, z10, z11, z12;
+  std::vector<double> u0, u1, u2, u3, u4, u5, u6, u7, u8, u9, u10, u11, u12;
 
   std::vector<std::vector<double>> x_vecs = {x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12};
   std::vector<std::vector<double>> y_vecs = {y0, y1, y2, y3, y4, y5, y6, y7, y8, y9, y10, y11, y12};
   std::vector<std::vector<double>> z_vecs = {z0, z1, z2, z3, z4, z5, z6, z7, z8, z9, z10, z11, z12};
+  std::vector<std::vector<double>> u_vecs = {u0, u1, u2, u3, u4, u5, u6, u7, u8, u9, u10, u11, u12};
 
   std::vector<std::string> x_names = {"x0", "x1", "x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12"};
   std::vector<std::string> y_names = {"y0", "y1", "y2", "y3", "y4", "y5", "y6", "y7", "y8", "y9", "y10", "y11", "y12"};
   std::vector<std::string> z_names = {"z0", "z1", "z2", "z3", "z4", "z5", "z6", "z7", "z8", "z9", "z10", "z11", "z12"};
+  std::vector<std::string> u_names = {"u0", "u1", "u2", "u3", "u4", "u5", "u6", "u7", "u8", "u9", "u10", "u11", "u12"};
 
 };
 #endif // SIMUDRIVE_H_

@@ -56,5 +56,11 @@ Videre arbeid:
 
 Discussion: 
 - ikke prøvd å kjøre bakover (?i think)
+- collision avoid med større vinkel + for snurring pga. stor bakdel
 
 
+coll-avoid changes:  (lidar softwareE?)
+- større "vinkel" og gjennomsnitt
+
+map generation:
+- "note that there are subtle changes is the local map through the report..."

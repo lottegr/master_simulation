@@ -64,23 +64,49 @@ bool CollisionAvoid::init()
 
 void CollisionAvoid::laserScanMsgCallBack(const sensor_msgs::LaserScan::ConstPtr &msg)
 {
-  uint16_t scan_angle[4] = {0, 90, 180, 270};
+  // uint16_t scan_angle[4] = {0, 90, 180, 270};
+  // uint16_t scan_angle[4] = {1011, 1515, 5, 506};
+  uint16_t scan_angle[28] = {1007, 1008, 1009, 1010, 1011, 1012, 1013,
+                             1512, 1513, 1514, 1515, 1516, 1517, 1518,
+                             2016, 2017, 2018,    0,    1,    2,    3,
+                             502,   503,  504,  505,  506,  507,  508};
 
-  for (int num = 0; num < 4; num++)
+
+
+  for (int num = 0; num < 28; num++)
   {
     if (std::isinf(msg->ranges.at(scan_angle[num])))
     {
-      scan_data_[num] = msg->range_max;
+      scan_data[num] = msg->range_max;
     }
     else
     {
-      scan_data_[num] = msg->ranges.at(scan_angle[num]);
+      scan_data[num] = msg->ranges.at(scan_angle[num]);
     }
   }
-  ROS_INFO_STREAM(scan_data_[0]);
-  ROS_INFO_STREAM(scan_data_[1]);
-  ROS_INFO_STREAM(scan_data_[2]);
-  ROS_INFO_STREAM(scan_data_[3]);
+
+  std::vector<int> vi = {0,7,14,21};
+  for (int i : vi)
+  {
+    double ant = 0;
+    double sum = 0;
+    for (int j=0; j<7; j++)
+    {
+      if (scan_data[i+j] != 0)
+      {
+        sum += scan_data[i+j];
+        ant += 1;
+      }
+    }
+    scan_data_[i/7] = sum/ant;
+  }
+
+  // ROS_INFO_STREAM(scan_data_[0] << "--"); 
+  // ROS_INFO_STREAM(scan_data_[1]); 
+  // ROS_INFO_STREAM(scan_data_[2]); 
+  // ROS_INFO_STREAM(scan_data_[3]); 
+
+  // ROS_INFO_STREAM((msg->ranges).size());
 }
 
 
@@ -143,8 +169,7 @@ void CollisionAvoid::updateObstacleBool(bool obst)
 
 bool CollisionAvoid::simulationLoop()
 {
-
-  if ((scan_data_[0] < 0.5 && cmd_lin_ >= 0) || (scan_data_[2] < 1 && cmd_lin_ <= 0)) 
+  if ((scan_data_[0] < 0.7 && cmd_lin_ >= 0 || (scan_data_[2] <= 1.2 && cmd_lin_ < 0)) ) 
   {
   
     if (env_ != "end_f" && env_ != "end_b")

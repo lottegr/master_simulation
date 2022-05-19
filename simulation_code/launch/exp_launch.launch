@@ -2,6 +2,6 @@
     <arg name="nav_node" default="u_turn"/>
 
     <!-- <node name="$(arg nav_node)" pkg="simulation_code" type="$(arg nav_node)" output="screen"/> -->
-    <!-- <node name="coll_avoid" pkg="simulation_code" type="coll_avoid" output="screen"/> -->
+    <node name="coll_avoid" pkg="simulation_code" type="coll_avoid" output="screen"/>
     <node name="exp_environment" pkg="simulation_code" type="exp_environment" output="screen"/>
 </launch>

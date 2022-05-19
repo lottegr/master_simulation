@@ -30,18 +30,23 @@
    </node>
    
 <!-- Run sensor fusion Kalman filter -->
-<include file="$(find robot_localization)/launch/ekf_amcl_odom.launch"/>
-<node name="pose_x_plot" pkg="rqt_plot" type="rqt_plot" 
-      args="/odom/pose/pose/position/x 
-            /amcl_pose/pose/pose/position/x
-            /odometry/filtered_map/pose/pose/position/x"/>
-<node name="pose_y_plot" pkg="rqt_plot" type="rqt_plot" 
-      args="/odom/pose/pose/position/y 
-            /amcl_pose/pose/pose/position/y
-            /odometry/filtered_map/pose/pose/position/y"/>
-<node name="pose_z_plot" pkg="rqt_plot" type="rqt_plot" 
-      args="/odom/pose/pose/orientation/z 
-            /amcl_pose/pose/pose/orientation/z 
-            /odometry/filtered_map/pose/pose/orientation/z" />
+   <include file="$(find robot_localization)/launch/ekf_amcl_odom.launch"/>
+   <node name="pose_x_plot" pkg="rqt_plot" type="rqt_plot" 
+         args="/odom/pose/pose/position/x 
+               /amcl_pose/pose/pose/position/x
+               /odometry/filtered_map/pose/pose/position/x"/>
+   <node name="pose_y_plot" pkg="rqt_plot" type="rqt_plot" 
+         args="/odom/pose/pose/position/y 
+               /amcl_pose/pose/pose/position/y
+               /odometry/filtered_map/pose/pose/position/y"/>
+   <node name="pose_z_plot" pkg="rqt_plot" type="rqt_plot" 
+         args="/odom/pose/pose/orientation/z 
+               /amcl_pose/pose/pose/orientation/z 
+               /odometry/filtered_map/pose/pose/orientation/z" />
+
+<!-- Run nodes for collision avoidance and environment finding -->
+   <node name="coll_avoid" pkg="simulation_code" type="coll_avoid" output="screen"/>
+   <node name="exp_environment" pkg="simulation_code" type="exp_environment" output="screen"/>
+
 
 </launch> 

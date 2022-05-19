@@ -252,7 +252,7 @@ bool SimulationDrive::simulationLoop()
   //-------------------- pid tuning -----------------------------
     
     // angle goal
-    // double out = feedback.rotate(pose_odom_rot, 0, false);
+    double out = feedback.rotate(pose_odom_rot, 0, false);
     
     // position goal
     // double out = feedback.driveStraight(0,pose_odom_pos_x,0,pose_odom_pos_y,2);
@@ -261,58 +261,57 @@ bool SimulationDrive::simulationLoop()
 
 
 
-    // line follow
-    if (i == 0)   // drive straight
-    {
-      if ( (abs(pose_odom_pos_x - 0) > 0.05) || (cmd_lin_ > 0.01) )
-      {
-        feedback.driveStraight(0,pose_odom_pos_x,0,pose_odom_pos_y,2);
-      }
-      else
-      {
-        updateCommandVelocity(0,0);
-        ros::Duration(1).sleep();
-        i += 1;
-      }
-    }       
-    else if (i == 1)            // rotate
-    {
-      if ( (abs(pose_odom_rot - (-90)) > 0.1) || (cmd_ang_ > 0.005) )
-      {
-        feedback.rotate(pose_odom_rot, -90, false);
-      }
-      else
-      {
-        updateCommandVelocity(0,0);
-        ros::Duration(2).sleep();
-        i += 1;
-      }
-    }
-    else if (i == 2)            // rotate
-    {
-      if ( (abs(pose_odom_rot - (-90)) > 0.1) || (cmd_ang_ > 0.005) )
-      {
-        feedback.rotate(pose_odom_rot, -90, false);
-      }
-      else
-      {
-        updateCommandVelocity(0,0);
-        ros::Duration(1).sleep();
-        i += 1;
-      }
-    }
-    else if (i == 3)
-    {
-      double out = feedback.driveStraight(1,0,0,pose_odom_rot,-90,false,1);
+    // // line follow
+    // if (i == 0)   // drive straight
+    // {
+    //   if ( (abs(pose_odom_pos_x - 0) > 0.05) || (cmd_lin_ > 0.01) )
+    //   {
+    //     feedback.driveStraight(0,pose_odom_pos_x,0,pose_odom_pos_y,2);
+    //   }
+    //   else
+    //   {
+    //     updateCommandVelocity(0,0);
+    //     ros::Duration(1).sleep();
+    //     i += 1;
+    //   }
+    // }       
+    // else if (i == 1)            // rotate
+    // {
+    //   if ( (abs(pose_odom_rot - (-90)) > 0.1) || (cmd_ang_ > 0.005) )
+    //   {
+    //     feedback.rotate(pose_odom_rot, -90, false);
+    //   }
+    //   else
+    //   {
+    //     updateCommandVelocity(0,0);
+    //     ros::Duration(2).sleep();
+    //     i += 1;
+    //   }
+    // }
+    // else if (i == 2)            // rotate
+    // {
+    //   if ( (abs(pose_odom_rot - (-90)) > 0.1) || (cmd_ang_ > 0.005) )
+    //   {
+    //     feedback.rotate(pose_odom_rot, -90, false);
+    //   }
+    //   else
+    //   {
+    //     updateCommandVelocity(0,0);
+    //     ros::Duration(1).sleep();
+    //     i += 1;
+    //   }
+    // }
+    // else if (i == 3)
+    // {
+    //   double out = feedback.driveStraight(1,0,0,pose_odom_rot,-90,false,1);
 
-      // y1.push_back(pose_odom_pos_x);
-      // y1u.push_back(out);
+      y1.push_back(pose_odom_rot);
+      u1.push_back(out);
 
-    
-      // feedback.write_to_file(y1, "sensor");
-      // feedback.write_to_file(y1u, "input");
+      feedback.write_to_file(y1, "sensor");
+      feedback.write_to_file(u1, "input");
 
-    }
+    // }
 
 
 
