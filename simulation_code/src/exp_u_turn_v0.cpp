@@ -47,6 +47,12 @@ bool SimulationDrive::init()
   environment_sub_ = nh_.subscribe("environment", 10, &SimulationDrive::environmentCallBack, this);
   obstacle_sub_ = nh_.subscribe("obstacle", 10, &SimulationDrive::obstacleCallBack, this);
 
+  // std::vector<double> goals = {1.5, 0,
+  //                              1.5, 2,
+  //                               0,  2};
+  // FeedbackFunctions feedback;
+  // goals_and_stuff = feedback.generateGoalsAndTargets(goals, 0, 0, pose_odom_pos_x, pose_odom_pos_y, pose_odom_rot);
+
   return true;
 }
 
@@ -232,15 +238,21 @@ bool SimulationDrive::simulationLoop()
                                         move_x_1, 0, 
                                         row2};
     std::vector<double> dirs = {1, 0,
-                                2, 0,
-                                0};
+                                0, 0,
+                                3};
 
-   
-    ROS_INFO_STREAM(i);
+    // std::vector<double> sensor_goal = goals_and_stuff[0];
+    // std::vector<double> sensor_line = goals_and_stuff[1];
+    // std::vector<double> target_goal = goals_and_stuff[2];
+    // std::vector<double> target_line = goals_and_stuff[3];
+    // std::vector<double> dirs = goals_and_stuff[4];
+
+   ROS_INFO_STREAM("Step: " << i << ", goal: " << target_goal[i] << ", measurement: " << sensor_goal[i]);
+    // ROS_INFO_STREAM(i);
     
     if (i%2 == 0)   // drive straight
     {
-      if ( abs(sensor_goal[i] - target_goal[i]) > 0.05 )
+      if ( abs(sensor_goal[i] - target_goal[i]) > 0.05 || cmd_lin_ > 0.01)
       {
           feedback.driveStraight(dirs[i],sensor_goal[i],target_goal[i],sensor_line[i],target_line[i]);
       }
@@ -253,7 +265,7 @@ bool SimulationDrive::simulationLoop()
     }       
     else            // rotate
     {
-      if ( abs(sensor_goal[i] - target_goal[i]) > 0.1 )
+      if ( abs(sensor_goal[i] - target_goal[i]) > 0.1 || cmd_ang_ > 0.01)
       {
           if (i != 3)
           {
@@ -271,6 +283,14 @@ bool SimulationDrive::simulationLoop()
           i += 1;
       }
     }
+
+    x_vecs[i].push_back(pose_odom_pos_x);
+    y_vecs[i].push_back(pose_odom_pos_y);
+    z_vecs[i].push_back(pose_odom_rot);
+
+    feedback.write_to_file(x_vecs[i], x_names[i]); 
+    feedback.write_to_file(y_vecs[i], y_names[i]); 
+    feedback.write_to_file(z_vecs[i], z_names[i]); 
   
     
 

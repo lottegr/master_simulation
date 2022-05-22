@@ -221,8 +221,9 @@ bool SimulationDrive::simulationLoop()
   {
     // forward
     FeedbackFunctions feedback;
-    feedback.driveStraight(1,0,0,pose_odom_pos_y,0,false,1);
+    double out = feedback.driveStraight(1,prev,0,pose_odom_pos_y,0,false,1);
 
+    prev = out;
     // backward
     // driveStraight(0,0,0,pose_odom_pos_y,0,false,-1);
 
@@ -251,7 +252,7 @@ int main(int argc, char* argv[])
   ros::init(argc, argv, "simudrive");
   SimulationDrive simudrive;
 
-  ros::Rate loop_rate(125);
+  ros::Rate loop_rate(10);
 
   
 

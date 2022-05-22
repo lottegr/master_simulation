@@ -2,7 +2,7 @@
 
     <arg name="nav_node" default="simudrive_feedback"/>
     <!-- roslaunch simulation_code multilaunch.launch nav_node:="NAME" -->
-    <arg name="sensor_fusion" default="false"/>
+    <arg name="sensor_fusion" default="true"/>
 
     <include file="$(find turtlebot3_gazebo)/launch/rail.launch" />
     <include file="$(find turtlebot3_navigation)/launch/turtlebot3_navigation.launch" />

@@ -222,5 +222,7 @@ class SimulationDrive
   std::vector<std::string> z_names = {"z0", "z1", "z2", "z3", "z4", "z5", "z6", "z7", "z8", "z9", "z10", "z11", "z12"};
   std::vector<std::string> u_names = {"u0", "u1", "u2", "u3", "u4", "u5", "u6", "u7", "u8", "u9", "u10", "u11", "u12"};
 
+
+  std::vector<std::vector<double>> goals_and_stuff;
 };
 #endif // SIMUDRIVE_H_

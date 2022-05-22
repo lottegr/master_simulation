@@ -83,6 +83,8 @@ class FeedbackFunctions
   double rotate(double sensor, double target, bool over180);
   double driveStraight(int dir, double sensor_lin, double target_lin, double sensor_ang, double target_ang, bool target_pos, int direction);
   void write_to_file(std::vector<double> v, std::string name);
+  std::vector<std::vector<double>> generateGoalsAndTargets(std::vector<double> coordinates, double x0, double y0, double meas_x, double meas_y, double meas_z);
+
 
  private:
   // ROS NodeHandle
@@ -121,7 +123,6 @@ class FeedbackFunctions
   void updateCommandVelocity(double linear, double angular);
   void odomMsgCallBack(const nav_msgs::Odometry::ConstPtr &msg);
   // void poseMsgCallBack(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr &msg);
-
 
 
   ros::Publisher steer_pub_;
