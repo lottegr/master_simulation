@@ -6,6 +6,9 @@
 
     <include file="$(find turtlebot3_gazebo)/launch/rail.launch" />
     <include file="$(find turtlebot3_navigation)/launch/turtlebot3_navigation.launch" />
+
+    <node pkg="tf" type="static_transform_publisher" name="base_link_to_p"
+    args="1.0 0.0 0.0 0.0 0.0  0.0 /base_link /p 40" />
     
     <group if="$(arg sensor_fusion)">
         <include file="$(find robot_localization)/launch/ekf_double.launch"/>

@@ -73,6 +73,13 @@ void SimulationDrive::odomMsgCallBack(const nav_msgs::Odometry::ConstPtr &msg)
   // twist
   twist_odom_lin = msg->twist.twist.linear.x;
   twist_odom_ang = msg->twist.twist.angular.z;
+
+
+  // front point 
+  
+
+
+
 }
 
 // void SimulationDrive::laserScanMsgCallBack(const sensor_msgs::LaserScan::ConstPtr &msg)

@@ -47,6 +47,7 @@ bool SimulationDrive::init()
   environment_sub_ = nh_.subscribe("environment", 10, &SimulationDrive::environmentCallBack, this);
   obstacle_sub_ = nh_.subscribe("obstacle", 10, &SimulationDrive::obstacleCallBack, this);
 
+
   // ROS_INFO_STREAM("x: ");
   // std::cin >> init_x;
   // ROS_INFO_STREAM("y: "); 
@@ -207,6 +208,31 @@ void SimulationDrive::write_to_file(std::vector<double> v, std::string name)
 
 
 
+void SimulationDrive::tfListener()
+{
+  tf::StampedTransform transform;
+
+  try
+  {
+    tf_p_listener.lookupTransform("/p", "/map", ros::Time(0), transform);
+  }
+  catch (tf::TransformException &ex) 
+  {
+    ROS_ERROR("%s",ex.what());
+    ros::Duration(1.0).sleep();
+  }
+  
+
+  
+  pose_p_pos_x = transform.getOrigin().x();
+
+  ROS_INFO_STREAM(pose_p_pos_x);
+
+  pose_p_pos_y = transform.getOrigin().y();
+  pose_p_rot;
+
+  return; 
+}
 
 
 
@@ -223,6 +249,8 @@ bool SimulationDrive::simulationLoop()
     FeedbackFunctions feedback;
     double out = feedback.driveStraight(1,prev,0,pose_odom_pos_y,0,false,1);
 
+
+    ROS_INFO_STREAM(pose_odom_pos_x << " --- " << pose_p_pos_x);
     prev = out;
     // backward
     // driveStraight(0,0,0,pose_odom_pos_y,0,false,-1);
@@ -258,6 +286,7 @@ int main(int argc, char* argv[])
 
   while (ros::ok())
   {
+    simudrive.tfListener();
     simudrive.simulationLoop();
     ros::spinOnce();
     loop_rate.sleep();

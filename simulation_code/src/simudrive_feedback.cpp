@@ -490,6 +490,30 @@ void SimulationDrive::write_to_file(std::vector<double> v, std::string name)
 
 
 
+void SimulationDrive::tfListener()
+{
+  tf::StampedTransform transform;
+
+  try
+  {
+    tf_p_listener.lookupTransform("/map", "/p" ros::Time(0), transform);
+  }
+  catch (tf::TransformException &ex) 
+  {
+    ROS_ERROR("%s",ex.what());
+    ros::Duration(1.0).sleep();
+  }
+
+  
+  pose_p_pos_x = -transform.getOrigin().x();
+  pose_p_pos_y = transform.getOrigin().y();
+  pose_p_rot;
+
+  // ROS_INFO_STREAM(pose_p_pos_x);
+  // ROS_INFO_STREAM("--------------------------------------------------------------------------------------------------");
+
+  return; 
+}
 
 
 
@@ -506,8 +530,11 @@ void SimulationDrive::write_to_file(std::vector<double> v, std::string name)
 bool SimulationDrive::simulationLoop()
 {
   static uint8_t rb_status = 0;
+  tfListener();
   
-  
+  ROS_INFO_STREAM(pose_odom_pos_x << " --x-- " << pose_p_pos_x);
+  ROS_INFO_STREAM(pose_odom_pos_y << " --y-- " << pose_p_pos_y);
+
 
   if (!obst_)
   {

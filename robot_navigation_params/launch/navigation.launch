@@ -6,9 +6,9 @@
       args="-d $(find robot_navigation_params)/map/config_pose.rviz"/>
 
 <!-- Run the robot model with transforms -->
-<include file="$(find rb1_description)/launch/remote.launch">
+   <include file="$(find rb1_description)/launch/remote.launch">
     <arg name="model" value="rb1_description" />
-  </include>
+   </include>
 
 <!-- Run the laser scan -->
    <!-- <include file="$(find ydlidar_ros)/launch/TG.launch" /> -->

@@ -36,13 +36,17 @@
         <arg name="y_pos" value="$(arg y_pos)"/>
         <arg name="z_pos" value="$(arg z_pos)"/>
     </include>  
+
+    <node pkg="tf" type="static_transform_publisher" name="base_link_to_p"
+    args="1.0 0.0 0.0 0.0 0.0  0.0 /base_link /p 40" />
+
     <!-- <include file="$(find turtlebot3_navigation)/launch/turtlebot3_navigation.launch">
         <arg name="initial_pose_x" value="$(arg initial_pose_x)"/>
         <arg name="initial_pose_y" value="$(arg initial_pose_y)"/>
         <arg name="initial_pose_a" value="$(arg initial_pose_a)"/>
     </include> -->
 
-    <!-- <node name="$(arg nav_node)" pkg="simulation_code" type="$(arg nav_node)" output="screen"/> -->
+    <node name="$(arg nav_node)" pkg="simulation_code" type="$(arg nav_node)" output="screen"/>
     <!-- <node name="localize" pkg="simulation_code" type="localize" output="screen"/>
     <node name="coll_avoid" pkg="simulation_code" type="coll_avoid" output="screen"/>
     <node name="environment" pkg="simulation_code" type="environment" output="screen"/> -->

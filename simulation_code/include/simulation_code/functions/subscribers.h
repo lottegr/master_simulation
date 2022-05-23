@@ -37,9 +37,9 @@
 #define dist_rows_y   1.5
 #define dist_rows_x   4
 
-#define forward   0 
+#define forwards   0 
 #define left      1
-#define backward  2
+#define backwards  2
 #define right     3
 
 

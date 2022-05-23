@@ -36,6 +36,7 @@
 
 #include <move_base_msgs/MoveBaseAction.h>
 #include <actionlib/client/simple_action_client.h>
+#include <tf/transform_listener.h>
 
 #include <fstream>
 
@@ -55,9 +56,9 @@
 #define dist_rows_y   1.5
 #define dist_rows_x   4
 
-#define forward   0 
+#define forwards   0 
 #define left      1
-#define backward  2
+#define backwards  2
 #define right     3
 
 #define get_placement   0 
@@ -80,6 +81,7 @@ class SimulationDrive
   bool init();
   bool controlLoop();
   bool simulationLoop();
+  void tfListener();
 
   // Functions
   double rotate(double sensor, double target, bool over180);
@@ -113,6 +115,9 @@ class SimulationDrive
   ros::Subscriber obstacle_sub_;
   ros::Subscriber cmd_vel_sub_;
 
+  // ROS tf listener
+  tf::TransformListener tf_p_listener;
+  
 
   // ROS Action Clients
   typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> status_client_;
@@ -137,13 +142,17 @@ class SimulationDrive
   double pose_goal_rot;
   double pose_goal_x;
   double pose_goal_y;
+  double pose_p_rot;
+  double pose_p_pos_x;
+  double pose_p_pos_y;
+
   double row_;
   std::string section_;
   std::string env_;
   bool obst_;
   double cmd_lin_;
   double cmd_ang_;
-
+  
   bool drive_f = true;
   bool drive_b = false;
   bool first = true;

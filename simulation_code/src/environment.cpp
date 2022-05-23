@@ -98,7 +98,7 @@ void Environment::updateEnvironment(std::string environment)
 
 bool Environment::simulationLoop()
 {
-  if (scan_data_[forward] > forward_dist_ && scan_data_[backward] > forward_dist_)  // not (obstacle ahead)
+  if (scan_data_[forwards] > forward_dist_ && scan_data_[backwards] > forward_dist_)  // not (obstacle ahead)
   {
     if (scan_data_[left] < side_dist_ && scan_data_[right] < side_dist_)                // if (on rail)
     {
@@ -129,13 +129,13 @@ bool Environment::simulationLoop()
   {
     if (scan_data_[left] < side_dist_ && scan_data_[right] < side_dist_)                // if (on rail)
     {
-      if (scan_data_[forward] < forward_dist_) 
+      if (scan_data_[forwards] < forward_dist_) 
       {
       updateEnvironment("end_f");
       drive_f = false;
       drive_b = true;
       }
-      else if (scan_data_[backward] < forward_dist_)
+      else if (scan_data_[backwards] < forward_dist_)
       {
       updateEnvironment("end_b");
       drive_f = true;
