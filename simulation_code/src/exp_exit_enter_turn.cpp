@@ -217,7 +217,25 @@ void SimulationDrive::write_to_file(std::vector<double> v, std::string name)
   return;
 }
 
+void SimulationDrive::tfListener()
+{
+  tf::StampedTransform transform;
 
+  try
+  {
+    tf_p_listener.lookupTransform("/map", "/p", ros::Time(0), transform);
+  }
+  catch (tf::TransformException &ex) 
+  {
+    ROS_ERROR("%s",ex.what());
+    ros::Duration(1.0).sleep();
+  }
+    
+  pose_p_pos_x = transform.getOrigin().x();
+  pose_p_pos_y = transform.getOrigin().y();
+
+  return; 
+}
 
 
 
@@ -229,6 +247,7 @@ void SimulationDrive::write_to_file(std::vector<double> v, std::string name)
 
 bool SimulationDrive::simulationLoop()
 {
+  tfListener();
   if (!obst_)
   {
 
@@ -247,9 +266,13 @@ bool SimulationDrive::simulationLoop()
                                         pose_odom_pos_x,
                                         pose_odom_rot,
                                         pose_odom_pos_x};
-    // std::vector<double> sensor_line = {pose_odom_pos_y,0,
-    //                                     pose_odom_pos_x,0,
-    //                                     pose_odom_pos_y};
+    std::vector<double> sensor_line = {pose_p_pos_x,0,
+                                        pose_p_pos_y,0,
+                                        pose_p_pos_x,0,
+                                        pose_p_pos_y,0,
+                                        pose_p_pos_x,0,
+                                        pose_p_pos_y,0,
+                                        pose_p_pos_x};
     std::vector<double> target_goal = {3.5, 
                                         0, 
                                         2, 
@@ -263,16 +286,20 @@ bool SimulationDrive::simulationLoop()
                                         0,
                                        -90,
                                         0};
-    // std::vector<double> target_line = {0, 0, 
-    //                                    move_x_1, 0, 
-    //                                    row2};
+    std::vector<double> target_line = {0, 0, 
+                                       3.5, 0, 
+                                       2, 0,
+                                       4.5, 0,
+                                       1.25, 0,
+                                       2.5, 0,
+                                       0};
     std::vector<double> dirs = {0, 0,
+                                1, 0,
                                 0, 0,
                                 0, 0,
+                                1, 0,
                                 0, 0,
-                                0, 0,
-                                0, 0,
-                                0};
+                                3};
 
     ROS_INFO_STREAM("Step: " << i << ", goal: " << target_goal[i] << ", measurement: " << sensor_goal[i]);
 

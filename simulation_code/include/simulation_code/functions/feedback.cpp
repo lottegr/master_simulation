@@ -105,89 +105,90 @@ void FeedbackFunctions::updateSteerAngle(double angle)
 
 
 
-// double FeedbackFunctions::rotate(double sensor, double target, bool over180)
-// {
-//   PID pid_ang = PID(0.1,0.8*ang_vel,-0.8*ang_vel, 0.02,0.0002,0);
+double FeedbackFunctions::rotate(double sensor, double target, bool over180)
+{
+  PID pid_ang = PID(0.1,0.8*ang_vel,-0.8*ang_vel, 0.02,0.0002,0);
 
-//   if (over180){
-//     if (sensor > 0){
-//       sensor = sensor;
-//     } else {
-//       sensor = 360 + sensor;
-//     }
-//   }
+  if (over180){
+    if (sensor > 0){
+      sensor = sensor;
+    } else {
+      sensor = 360 + sensor;
+    }
+  }
 
-//   double output_ang = pid_ang.calculate(target, sensor);
-//   updateCommandVelocity(0, output_ang); 
+  double output_ang = pid_ang.calculate(target, sensor);
+  updateCommandVelocity(0, output_ang); 
 
-//   return output_ang;
-// }
+  return output_ang;
+}
 
 
 
-// double FeedbackFunctions::driveStraight(int dir, double sensor_lin, double target_lin, double sensor_ang, double target_ang, bool target_pos=true, int direction=1)
-// {
-//   if (target_pos)
-//   {
-//     // PID pid_lin = PID(0.1,lin_vel,-lin_vel, 1, 0.05, 0.5);
-//     PID pid_lin = PID(0.1,lin_vel,-lin_vel, 1, 0.05, 0);
+double FeedbackFunctions::driveStraight(int dir, double sensor_lin, double target_lin, double sensor_ang, double target_ang, bool target_pos=true, int direction=1)
+{
+  if (target_pos)
+  {
+    // PID pid_lin = PID(0.1,lin_vel,-lin_vel, 1, 0.05, 0.5);
+    PID pid_lin = PID(0.1,lin_vel,-lin_vel, 1, 0.05, 0);
 
-//     PID pid_ang = PID(0.1,ang_vel,-ang_vel, 1, 0, 0);         // droppe D-term ??
+    PID pid_ang = PID(0.1,ang_vel,-ang_vel, 1.5, 0.01, 2);         // droppe D-term ??
     
-//     double output_lin = pid_lin.calculate(target_lin,sensor_lin);
-//     // double output_ang = pid_ang.calculate(target_ang,sensor_ang);
-//     double output_ang = 0;
-//     if (dir == 0) {
-//       updateCommandVelocity(output_lin, -output_ang);
-//     } else if (dir == 1){
-//       updateCommandVelocity(output_lin, output_ang); 
-//     } else if (dir == 2) {
-//       updateCommandVelocity(-output_lin, output_ang);
-//     } else if (dir == 3) {
-//       updateCommandVelocity(-output_lin, -output_ang); 
-//     } 
+    double output_lin = pid_lin.calculate(target_lin,sensor_lin);
+    double output_ang = pid_ang.calculate(target_ang,sensor_ang);
+    if (dir == 0) {
+      updateCommandVelocity(output_lin, -output_ang);
+    } else if (dir == 1){
+      updateCommandVelocity(output_lin, output_ang); 
+    } else if (dir == 2) {
+      updateCommandVelocity(-output_lin, output_ang);
+    } else if (dir == 3) {
+      updateCommandVelocity(-output_lin, -output_ang); 
+    } 
 
-//     return output_lin;
-//   }
+    return output_lin;
+  }
 
-//   else
-//   {
-//     // PID pid = PID(0.1,ang_vel,-ang_vel, 0.5, 0.02, 2.5);
-//     // double output = pid.calculate(target_ang,sensor_ang);
+  else
+  {
+    PID pid = PID(0.1,ang_vel,-ang_vel, 1.5, 0.01, 2);
+    double output = pid.calculate(target_ang,sensor_ang);
 
-//     // if (dir == 1)
-//     // {
-//     //   updateCommandVelocity(direction*lin_vel, direction*output);
-//     // }
-//     // else 
-//     // {
-//     //   updateCommandVelocity(direction*lin_vel, -direction*output);
-//     // }
+    if (dir == 1)
+    {
+      updateCommandVelocity(direction*lin_vel, direction*output);
+    }
+    else 
+    {
+      updateCommandVelocity(direction*lin_vel, -direction*output);
+    }
 
-//     PID pid = PID(0.1,10,-10,     1, 0, 5);
-//     double output_ = pid.calculate(target_ang,sensor_ang);
+    return output;
 
-//     ROS_INFO_STREAM(output_ << "     " << sensor_lin);
-//     double output = 10*(output_ - sensor_lin);
-//     ROS_INFO_STREAM("--  " << output);
+    // PID pid = PID(0.1,10,-10,     1, 0, 5);
+    // double output_ = pid.calculate(target_ang,sensor_ang);
 
-//     if (dir == 1)
-//     {
-//       updateCommandVelocity(direction*2*lin_vel, direction*output);
-//     }
-//     else 
-//     {
-//       updateCommandVelocity(direction*2*lin_vel, -direction*output);
-//     }
+    // ROS_INFO_STREAM(output_ << "     " << sensor_lin);
+    // double output = 10*(output_ - sensor_lin);
+    // ROS_INFO_STREAM("--  " << output);
+
+    // if (dir == 1)
+    // {
+    //   updateCommandVelocity(direction*2*lin_vel, direction*output);
+    // }
+    // else 
+    // {
+    //   updateCommandVelocity(direction*2*lin_vel, -direction*output);
+    // }
     
-//     prev = output_;
+    // prev = output_;
 
-//     // double prev = out;
+    // // double prev = out;
 
-//     return output_;
-//   }
+    // return output_;
+  }
 
-// }
+}
 
 void FeedbackFunctions::write_to_file(std::vector<double> v, std::string name)
 {
@@ -214,69 +215,69 @@ void FeedbackFunctions::write_to_file(std::vector<double> v, std::string name)
 
 
 
-double FeedbackFunctions::rotate(double sensor, double target, bool over180)
-{
-  PID pid_ang = PID(0.1,ang_vel,-ang_vel, 0.02,0,0);
+// double FeedbackFunctions::rotate(double sensor, double target, bool over180)
+// {
+//   PID pid_ang = PID(0.1,ang_vel,-ang_vel, 0.02,0,0);
 
-  if (over180){
-    if (sensor > 0){
-      sensor = sensor;
-    } else {
-      sensor = 360 + sensor;
-    }
-  }
+//   if (over180){
+//     if (sensor > 0){
+//       sensor = sensor;
+//     } else {
+//       sensor = 360 + sensor;
+//     }
+//   }
 
-  double output_ang = pid_ang.calculate(target, sensor);
-  updateCommandVelocity(0, output_ang); 
+//   double output_ang = pid_ang.calculate(target, sensor);
+//   updateCommandVelocity(0, output_ang); 
 
-  return output_ang;
-}
+//   return output_ang;
+// }
 
 
 
-double FeedbackFunctions::driveStraight(int dir, double sensor_lin, double target_lin, double sensor_ang, double target_ang, bool target_pos=true, int direction=1)
-{
-  if (target_pos)
-  {
-    // PID pid_lin = PID(0.1,lin_vel,-lin_vel, 1, 0.05, 0.5);
-    PID pid_lin = PID(0.1,lin_vel,-lin_vel, 1, 0, 0);
+// double FeedbackFunctions::driveStraight(int dir, double sensor_lin, double target_lin, double sensor_ang, double target_ang, bool target_pos=true, int direction=1)
+// {
+//   if (target_pos)
+//   {
+//     // PID pid_lin = PID(0.1,lin_vel,-lin_vel, 1, 0.05, 0.5);
+//     PID pid_lin = PID(0.1,lin_vel,-lin_vel, 1, 0, 0);
 
-    PID pid_ang = PID(0.1,ang_vel,-ang_vel, 1, 0, 0);         // droppe D-term ??
+//     PID pid_ang = PID(0.1,ang_vel,-ang_vel, 1, 0, 0);         // droppe D-term ??
     
-    double output_lin = pid_lin.calculate(target_lin,sensor_lin);
-    double output_ang = pid_ang.calculate(target_ang,sensor_ang);
-    // double output_ang = 0;
-    if (dir == 0) {
-      updateCommandVelocity(output_lin, -output_ang);
-    } else if (dir == 1){
-      updateCommandVelocity(output_lin, output_ang); 
-    } else if (dir == 2) {
-      updateCommandVelocity(-output_lin, output_ang);
-    } else if (dir == 3) {
-      updateCommandVelocity(-output_lin, -output_ang); 
-    } 
+//     double output_lin = pid_lin.calculate(target_lin,sensor_lin);
+//     double output_ang = pid_ang.calculate(target_ang,sensor_ang);
+//     // double output_ang = 0;
+//     if (dir == 0) {
+//       updateCommandVelocity(output_lin, -output_ang);
+//     } else if (dir == 1){
+//       updateCommandVelocity(output_lin, output_ang); 
+//     } else if (dir == 2) {
+//       updateCommandVelocity(-output_lin, output_ang);
+//     } else if (dir == 3) {
+//       updateCommandVelocity(-output_lin, -output_ang); 
+//     } 
 
-    return output_lin;
-  }
+//     return output_lin;
+//   }
 
-  else
-  {
-    PID pid = PID(0.1,ang_vel,-ang_vel, 0.5, 0, 2.5);
-    double output = pid.calculate(target_ang,sensor_ang);
+//   else
+//   {
+//     PID pid = PID(0.1,ang_vel,-ang_vel, 0.5, 0, 2.5);
+//     double output = pid.calculate(target_ang,sensor_ang);
 
-    if (dir == 1)
-    {
-      updateCommandVelocity(direction*lin_vel, direction*output);
-    }
-    else 
-    {
-      updateCommandVelocity(direction*lin_vel, -direction*output);
-    }
+//     if (dir == 1)
+//     {
+//       updateCommandVelocity(direction*lin_vel, direction*output);
+//     }
+//     else 
+//     {
+//       updateCommandVelocity(direction*lin_vel, -direction*output);
+//     }
 
-    return output;
-  }
+//     return output;
+//   }
 
-}
+// }
 
 
 

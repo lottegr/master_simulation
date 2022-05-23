@@ -496,7 +496,7 @@ void SimulationDrive::tfListener()
 
   try
   {
-    tf_p_listener.lookupTransform("/map", "/p" ros::Time(0), transform);
+    tf_p_listener.lookupTransform("/map", "/p", ros::Time(0), transform);
   }
   catch (tf::TransformException &ex) 
   {

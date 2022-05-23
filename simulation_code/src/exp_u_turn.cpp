@@ -218,6 +218,26 @@ void SimulationDrive::write_to_file(std::vector<double> v, std::string name)
 }
 
 
+void SimulationDrive::tfListener()
+{
+  tf::StampedTransform transform;
+
+  try
+  {
+    tf_p_listener.lookupTransform("/map", "/p", ros::Time(0), transform);
+  }
+  catch (tf::TransformException &ex) 
+  {
+    ROS_ERROR("%s",ex.what());
+    ros::Duration(1.0).sleep();
+  }
+    
+  pose_p_pos_x = transform.getOrigin().x();
+  pose_p_pos_y = transform.getOrigin().y();
+
+  return; 
+}
+
 
 
 
@@ -229,6 +249,7 @@ void SimulationDrive::write_to_file(std::vector<double> v, std::string name)
 
 bool SimulationDrive::simulationLoop()
 {
+  tfListener();
   if (!obst_)
   {
 
@@ -239,18 +260,18 @@ bool SimulationDrive::simulationLoop()
                                         pose_odom_pos_x,
                                         pose_odom_rot,
                                         pose_odom_pos_x};
-    // std::vector<double> sensor_line = {pose_odom_pos_y,0,
-    //                                     pose_odom_pos_x,0,
-    //                                     pose_odom_pos_y};
+    std::vector<double> sensor_line = {pose_p_pos_x,0,
+                                        pose_p_pos_y,0,
+                                        pose_p_pos_x};
     std::vector<double> target_goal = {2.6, 
                                         0, 
                                         0, 
                                        -90, 
                                         0};
-    // std::vector<double> target_line = {0, 0, 
-    //                                    move_x_1, 0, 
-    //                                    row2};
-    std::vector<double> dirs = {0, 0,
+    std::vector<double> target_line = {-2.6, 0, 
+                                       2.6, 0, 
+                                       0};
+    std::vector<double> dirs = {0, 0, 
                                 1, 0,
                                 2};
 
@@ -260,15 +281,14 @@ bool SimulationDrive::simulationLoop()
     {
       if (i==4)
       {
-        // double out = feedback.driveStraight(1,0,0,sensor_goal[i],target_goal[i],false,1);
+        double out = feedback.driveStraight(1,sensor_goal[i],target_goal[i],sensor_line[i],target_line[i],false,1);
         // u_vecs[i].push_back(cmd_ang_);
-        updateCommandVelocity(lin_vel, 0); 
       }
       else 
       {
         if ( abs(sensor_goal[i] - target_goal[i]) > 0.05 || cmd_lin_ > 0.005 )
         {
-          feedback.driveStraight(dirs[i],sensor_goal[i],target_goal[i],0,0);
+          feedback.driveStraight(dirs[i],sensor_goal[i],target_goal[i],sensor_line[i],target_line[i]);
           u_vecs[i].push_back(cmd_lin_);
         }
         else

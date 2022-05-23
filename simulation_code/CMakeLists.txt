@@ -95,7 +95,7 @@ add_executable(drive_straight src/exp_drive_straight.cpp)
 target_link_libraries(drive_straight ${catkin_LIBRARIES})
 add_dependencies(drive_straight ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-add_executable(u_turn src/exp_u_turn_v0.cpp)
+add_executable(u_turn src/exp_u_turn.cpp)
 target_link_libraries(u_turn ${catkin_LIBRARIES})
 add_dependencies(u_turn ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 

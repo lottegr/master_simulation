@@ -5,12 +5,12 @@ import numpy as np
 
 # ------------
 
-for i in range(20,50):
+for i in range(1,5):
     plot_nr = str(i)
     ref = 0
 
-    xlab = 'Position x [m]'
-    ulab = 'Angular velocity [rad/s]'
+    xlab = ''
+    ulab = 'Velocity [m/s]'
 
     # xlab = 'Position [m]'
     # ulab = 'Velocity [m/s]'
@@ -26,10 +26,10 @@ for i in range(20,50):
     lines_x = x_.readlines()
     lines_u = u_.readlines()
     for l in lines_x:
-        if float(l) != 0:
+        if abs(float(l)) > 1e-100:
             x.append(float(l))
     for l in lines_u:
-        if float(l) != 0:
+        if abs(float(l)) > 1e-100:
             u.append(float(l))
 
 
