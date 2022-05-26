@@ -10,7 +10,7 @@
     <arg name="model" value="rb1_description" />
    </include>
    <node pkg="tf" type="static_transform_publisher" name="base_link_to_p"
-    args="0.5 0.0 0.0 0.0 0.0  0.0 /base_link /p 40" />
+    args="0.4 0.0 0.0 0.0 0.0  0.0 /base_link /p 40" />
 
 <!-- Run the laser scan -->
    <!-- <include file="$(find ydlidar_ros)/launch/TG.launch" /> -->

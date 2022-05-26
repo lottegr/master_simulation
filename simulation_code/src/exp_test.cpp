@@ -313,7 +313,7 @@ bool SimulationDrive::simulationLoop()
     }
     else if (i == 2)
     {
-      double out = feedback.driveStraight(1,0,0,pose_p_pos_x,0,false,1);
+      double out = feedback.driveStraight(1,0,0,pose_p_pos_x,1,false,1);
 
       x0.push_back(pose_odom_pos_x);
       x1.push_back(pose_p_pos_x);

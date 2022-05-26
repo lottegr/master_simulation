@@ -9,10 +9,10 @@ import numpy as np
 lab = ["P =1", "P = 0.5", "P = 0.25"]
 j = -1
 # for i in range(5,10):
-for i in ['08', 16]:
+for i in [18,20]:
     j += 1
     plot_nr = str(i)
-    ref = 0
+    ref = 1
 
     xlab = 'Position [m]'
     ulab = 'Angular velocity [rad/s]'
