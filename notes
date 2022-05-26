@@ -64,3 +64,7 @@ coll-avoid changes:  (lidar softwareE?)
 
 map generation:
 - "note that there are subtle changes is the local map through the report..."
+
+
+obs! obstacles that are not in map (tables)   could be drawn in manually? but how does it work with local map
+
