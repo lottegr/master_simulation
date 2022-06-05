@@ -6,6 +6,7 @@
 #include <std_msgs/String.h>
 #include <geometry_msgs/PoseWithCovariance.h>
 #include <geometry_msgs/TwistWithCovariance.h>
+#include <tf/transform_listener.h>
 
 
 #define DEG2RAD (M_PI / 180.0)
@@ -39,6 +40,9 @@ class OdomSwitch
   ros::Subscriber odom_rail_sub_;
   ros::Subscriber environment_sub_;
 
+  // ROS tf listener
+  tf::TransformListener tf_p_listener;  
+
   // Variables
   std_msgs::Header header_g;
   std::string child_frame_id_g;
@@ -55,16 +59,23 @@ class OdomSwitch
   geometry_msgs::PoseWithCovariance pose;
   geometry_msgs::TwistWithCovariance twist;
 
+  double pose_pos_x;
+  double pose_pos_y;
+  double pose_rot_z;
+  double pose_rot_w;
+
   std::string env_;
   
   // Functions
   void updateOdom(std_msgs::Header header, 
                   std::string child_frame_id,
                   geometry_msgs::PoseWithCovariance pose,
-                  geometry_msgs::TwistWithCovariance twist);
+                  geometry_msgs::TwistWithCovariance twist, float x, float y, float z, float w);
   
   void odomGroundCallBack(const nav_msgs::Odometry::ConstPtr &msg);
   void odomRailCallBack(const nav_msgs::Odometry::ConstPtr &msg);
   void environmentCallBack(const std_msgs::StringConstPtr &msg);
+
+  void tfListener();
   
 };

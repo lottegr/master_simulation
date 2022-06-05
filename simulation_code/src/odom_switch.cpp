@@ -23,13 +23,10 @@ OdomSwitch::~OdomSwitch()
 bool OdomSwitch::init()
 {
   // initialize publishers
-  odom_pub_ = nh_.advertise<nav_msgs::Odometry>("/odom", 10);
+  odom_pub_ = nh_.advertise<nav_msgs::Odometry>("/odom_", 10);
 
   // initialize subscribers
-  odom_ground_sub_ = nh_.subscribe("odom_ground", 10, &OdomSwitch::odomGroundCallBack, this);
-  odom_rail_sub_ = nh_.subscribe("odom_rail", 10, &OdomSwitch::odomRailCallBack, this);
-  environment_sub_ = nh_.subscribe("environment", 10, &OdomSwitch::environmentCallBack, this);
-
+  odom_ground_sub_ = nh_.subscribe("odom", 10, &OdomSwitch::odomGroundCallBack, this);
     
   return true;
 }
@@ -46,19 +43,6 @@ void OdomSwitch::odomGroundCallBack(const nav_msgs::Odometry::ConstPtr &msg)
   twist_g = msg->twist;
 }
 
-void OdomSwitch::odomRailCallBack(const nav_msgs::Odometry::ConstPtr &msg)
-{
-  header_r = msg->header;
-  child_frame_id_r = msg->child_frame_id;
-  pose_r = msg->pose;
-  twist_r = msg->twist;
-}
-
-void OdomSwitch::environmentCallBack(const std_msgs::String::ConstPtr &msg)
-{
-  env_ = msg->data;
-}
-
 
 
 // publishers
@@ -66,18 +50,73 @@ void OdomSwitch::environmentCallBack(const std_msgs::String::ConstPtr &msg)
 void OdomSwitch::updateOdom(std_msgs::Header header, 
                             std::string child_frame_id,
                             geometry_msgs::PoseWithCovariance pose,
-                            geometry_msgs::TwistWithCovariance twist)
+                            geometry_msgs::TwistWithCovariance twist, float x, float y, float z, float w)
 {
   nav_msgs::Odometry odom;
 
-  odom.pose = pose;
+  odom.header = header_g;
+  odom.header.frame_id = "map";
+  odom.child_frame_id = child_frame_id_g;
+
+
+  double siny = 2.0 * (w * z );
+	double cosy = 1.0 - 2.0 * (z * z);  
+  double sinyy = 2.0 * (pose.pose.orientation.w * pose.pose.orientation.z);
+	double cosyy = 1.0 - 2.0 * (pose.pose.orientation.z * pose.pose.orientation.z);  
+
+	// pose_odom_rot = atan2(siny, cosy) * RAD2DEG;
+
+  double rotmap = atan2(siny, cosy);
+  double rotodom = atan2(sinyy, sinyy);
+
+  // double xmap = 
+  // double ymap = 
+  double xodom = pose.pose.position.x;
+  double yodom = pose.pose.position.y;
+
+
+  odom.pose.pose.position.x = x + sqrt(xodom*xodom + yodom*yodom)*cos(rotodom);
+  odom.pose.pose.position.y = y + + sqrt(xodom*xodom + yodom*yodom)*sin(rotodom);;
+  odom.pose.pose.orientation.z = pose.pose.orientation.z + z;
+  odom.pose.pose.orientation.w = pose.pose.orientation.w + w;
 
   odom_pub_.publish(odom);
 }
 
 
+// void tfToPose(tf::Transform &trans, geometry_msgs::PoseStamped &msg)
+//  {
+//    tf::quaternionTFToMsg(trans.getRotation(), msg.pose.orientation);
+//    msg.pose.position.x = trans.getOrigin().x();
+//    msg.pose.position.y = trans.getOrigin().y();
+//    msg.pose.position.z = trans.getOrigin().z();
+//  }
 
 
+
+
+void OdomSwitch::tfListener()
+{
+  tf::StampedTransform transform;
+
+  try
+  {
+    tf_p_listener.lookupTransform("/map", "/odom", ros::Time(0), transform);
+  }
+  catch (tf::TransformException &ex) 
+  {
+    ROS_ERROR("%s",ex.what());
+    ros::Duration(1.0).sleep();
+  }
+    
+
+  pose_pos_x = transform.getOrigin().x();
+  pose_pos_y = transform.getOrigin().y();
+  pose_rot_z = transform.getRotation().getZ();
+  pose_rot_w = transform.getRotation().getW();
+
+  return; 
+}
 
 
 
@@ -87,38 +126,11 @@ void OdomSwitch::updateOdom(std_msgs::Header header,
 
 bool OdomSwitch::simulationLoop()
 {
-  static uint8_t find_env = 0;
-  static uint8_t find_section = 0;
+  tfListener();
 
-  static uint8_t row_ = 0;
-  static const char* section_ = " ";
+  updateOdom(header_g, child_frame_id_g, pose_g, twist_g, pose_pos_x, pose_pos_y, pose_rot_z, pose_rot_w);
 
 
-    switch(find_env)
-    {
-      case 0:
-        if (env_.substr(0,4) == "rail")
-        {
-          find_env = 1;
-          ROS_INFO_STREAM("rail");
-        }
-        else
-        {
-          find_env = 2;
-          ROS_INFO_STREAM("ground");
-        }
-        break;
-
-      case 1:
-        updateOdom(header_r, child_frame_id_r, pose_r, twist_r);
-        find_env = 0;
-        break;
-
-      case 2:
-        updateOdom(header_g, child_frame_id_g, pose_g, twist_g);
-        find_env = 0;
-        break;
-    }
 
     
 
