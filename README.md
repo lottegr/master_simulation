@@ -10,7 +10,7 @@
 | robot_localization_demo | A tutorial for using robot_localization, used launch file is inspired from this        |
 | robot_navigation_params | Parameters for setting up navigation stack on robot                                    |
 | simulation_code         | Mostly all new developed code, like navigation nodes, feedback, odometry generation ++ |
-| __turtlebot_xxx_        | TurtleBot3 files, mostly kept as original                                              |
+| _turtlebot_xxx_         | TurtleBot3 files, mostly kept as original                                              |
 | ydlidar_ros             | Files for launching the LiDAR TG15                                                     |
 | _other files_           | Files for making the different plots included in the thesis                            |
 
